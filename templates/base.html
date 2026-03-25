@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <!--<link rel="stylesheet" href="/static/css/styles.css"> -->
+    <link href="{{ url_for('static', path='css/styles.css') }}" rel="stylesheet">
+</head>
+<body>
+    <header class="site-header">
+
+  <!--
+    .header-inner is position:relative — both the mobile dropdown
+    and the desktop centered nav use absolute positioning relative to it.
+
+    Mobile:  [brand ................] [☰]
+             dropdown appears below bar, right-aligned, content-width only
+
+    Desktop: [brand] [nav — centered] [          ]
+             nav absolutely centered via left:50% + translateX(-50%)
+  -->
+  <div class="header-inner">
+
+    <!-- Brand: image + title -->
+    <a href="/" class="brand" aria-label="Home">
+      <div class="brand-avatar">
+        <img src="/static/images/mt-hood-small.jpg"
+             alt="Profile photo"
+             onerror="this.style.display='none'; this.parentNode.textContent='✦';" />
+      </div>
+      <span class="brand-name">
+        {{ title }}
+      </span>
+    </a>
+
+    <!-- Nav: absolutely positioned in both mobile & desktop contexts -->
+    <nav id="nav-drawer"
+         class="nav-drawer"
+         aria-label="Main navigation">
+      <ul>
+        <li>
+          <a href="/current_time"
+             class="{{ 'active' if active_page == 'nav1' else '' }}"
+             hx-get="/current_time"
+             hx-target="#main-content"
+             hx-push-url="true">Nav1</a>
+        </li>
+        <li>
+          <a href="/nav2"
+             class="{{ 'active' if active_page == 'nav2' else '' }}"
+             hx-get="/nav2"
+             hx-target="#main-content"
+             hx-push-url="true">Nav2</a>
+        </li>
+        <li>
+          <a href="/nav3"
+             class="{{ 'active' if active_page == 'nav3' else '' }}"
+             hx-get="/nav3"
+             hx-target="#main-content"
+             hx-push-url="true">Nav3</a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Hamburger (mobile only — triggers the dropdown) -->
+    <button class="nav-toggle"
+            id="nav-toggle"
+            aria-controls="nav-drawer"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </button>
+
+  </div><!-- /.header-inner -->
+
+</header>
+
+<!-- Main content target for HTMX swaps -->
+<main id="main-content">
+  {% block content %}{% endblock %}
+</main>
+<script>
+  const toggle = document.getElementById('nav-toggle');
+  const drawer = document.getElementById('nav-drawer');
+
+  toggle.addEventListener('click', () => {
+    const isOpen = drawer.classList.toggle('is-open');
+    toggle.setAttribute('aria-expanded', isOpen);
+  });
+
+  // Close when a nav link is clicked
+  drawer.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      drawer.classList.remove('is-open');
+      toggle.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  // Close when clicking outside the header
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.site-header')) {
+      drawer.classList.remove('is-open');
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  // Close on Escape
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && drawer.classList.contains('is-open')) {
+      drawer.classList.remove('is-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.focus();
+    }
+  });
+</script>
+</body>
+</html>

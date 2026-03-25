@@ -1,0 +1,19 @@
+<!-- Partial: returned by GET /partials/stats and swapped into #stats-container -->
+
+    <div class="card">
+        <h3 class="card-label">Total Users</h3>
+        <p class="card-value">{{ stats.total_users }}</p>
+    </div>
+    <div class="card">
+        <h3 class="card-label">Active Sessions</h3>
+        <p class="card-value">{{ stats.active_sessions }}</p>
+    </div>
+    <div class="card">
+        <h3 class="card-label">Revenue Today</h3>
+        <p class="card-value">${{ "%.2f"|format(stats.revenue_today) }}</p>
+    </div>
+    <div class="card">
+        <h3 class="card-label">Error Rate</h3>
+        <p class="card-value">{{ stats.error_rate }}%</p>
+    </div>
+

@@ -1,0 +1,486 @@
+/* -- design colors for Caron 
+    --primary:       #fdf0e8;
+    --ink:           #2e1a20;
+    --secondary:     #e8c8c0;
+    --header-bg:     #7a3a4a;
+    --header-border: #a05060;
+    --accent:        #e8856a;
+} */
+
+/* Design colors for Alan 
+      --primary:       #e8dcc8;
+      --ink:           #2e2416;
+      --secondary:     #c9b99a;
+      --header-bg:     #4a3728;
+      --header-border: #6b4c35;
+      --accent:        #c17f3e;
+*/
+
+/* ── Design Tokens — Earth Tones ───────────────── */
+    :root {
+    --primary:       #fdf0e8;
+    --ink:           #2e1a20;
+    --ink-muted:     #4b4748;
+    --secondary:     #e8c8c0;
+    --header-bg:     #7a3a4a;
+    --header-border: #a05060;
+    --boarder:        #d39c69;
+    --accent:        #e8856a;
+    --debug: red;
+    --gap: .5rem;
+    --label-w: 120px;
+    --input-max: 320px;
+    --radius:       8px;
+    --nav-h:         100px;
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body:    'DM Sans', sans-serif;
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--primary);
+      color: var(--ink);
+      font-family: var(--font-body);
+    }
+
+    /* ── Header Shell ──────────────────────────────── */
+    /* position:relative so the mobile dropdown can be  */
+    /* absolutely positioned relative to the header     */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--header-bg);
+      border-bottom: 2px solid var(--header-border);
+      box-shadow: 0 4px 24px rgba(20,12,4,0.35);
+    }
+
+    /* ── Top bar: brand left, hamburger right ───────── */
+    .header-inner {
+      position: relative;   /* anchor for both mobile & desktop nav */
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: var(--nav-h);
+      padding: 0 1.25rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* ── Brand / Logo ──────────────────────────────── */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 2;
+    }
+
+    .brand-avatar {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      border: 2.5px solid var(--accent);
+      box-shadow: 0 0 0 3px rgba(193,127,62,0.25);
+      background: var(--header-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      color: var(--accent);
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .brand-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .brand-name {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      color: var(--primary);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+
+    .brand-name span { color: var(--accent); }
+
+    /* ── Hamburger Button ──────────────────────────── */
+    .nav-toggle {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      width: 36px;
+      height: 36px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      transition: background 0.2s;
+      -webkit-tap-highlight-color: transparent;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 2;
+    }
+
+    .nav-toggle:hover { background: var(--header-border); }
+
+    .nav-toggle .bar {
+      display: block;
+      width: 100%;
+      height: 2px;
+      background: var(--primary);
+      border-radius: 2px;
+      transform-origin: center;
+      transition: transform 0.35s var(--ease-out),
+                  opacity   0.25s ease,
+                  width     0.3s  var(--ease-out);
+    }
+
+    .nav-toggle[aria-expanded="true"] .bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-toggle[aria-expanded="true"] .bar:nth-child(2) { opacity: 0; width: 0; }
+    .nav-toggle[aria-expanded="true"] .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ── Mobile Nav Dropdown ───────────────────────── */
+    /* Absolutely positioned: drops below the bar,      */
+    /* pinned to the right edge, width = content only   */
+    .nav-drawer {
+      position: absolute;
+      top: var(--nav-h);      /* flush below the top bar              */
+      right: 0;               /* pinned to right edge of .header-inner */
+      min-width: 160px;
+      white-space: nowrap;    /* keeps each link on one line           */
+      z-index: 99;
+
+      /* Collapse animation via clip-path + opacity */
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-6px);
+      transition: opacity    0.25s var(--ease-out),
+                  transform  0.25s var(--ease-out);
+
+      background: var(--secondary);
+      border: 1px solid var(--header-border);
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 8px 24px rgba(20,12,4,0.45);
+      overflow: hidden;
+    }
+
+    .nav-drawer.is-open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .nav-drawer ul {
+      list-style: none;
+      padding: 0.35rem 0;
+      margin: 0;
+    }
+
+    .nav-drawer li { border-bottom: 1px solid var(--header-border); }
+    .nav-drawer li:last-child { border-bottom: none; }
+
+    .nav-drawer a {
+      display: block;
+      padding: 0.75rem 1.5rem;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--primary);
+      text-decoration: none;
+      letter-spacing: 0.03em;
+      transition: color 0.2s, background 0.2s, padding-left 0.2s var(--ease-out);
+    }
+
+    .nav-drawer a:hover,
+    .nav-drawer a.active {
+      color: var(--accent);
+      background: rgba(193,127,62,0.1);
+      padding-left: 1.9rem;
+    }
+
+    /* -- Display Grid for Pages */
+    .dashboard-grid {
+      display: grid;
+      gap: var(--gap);
+      padding: var(--gap);
+      grid-template-columns: 1fr;          /* mobile: 1 col */
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 1rem;
+      background-color: var(--primary);
+    }
+
+    .column {
+      flex: 1;
+      padding: .5rem;
+      background: var(--secondary);
+      border-radius: 8px;
+    }
+
+/* Span helpers */
+    .col-full { 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      grid-column: 1 / -1; 
+    }      /* always full width */
+
+/* ─────────────────────────────────────────
+       CARD
+    ───────────────────────────────────────── */
+
+    .card {
+      background: var(--primary);
+      border: 1px solid var(--header-border);
+      border-radius: var(--radius);
+      padding: .5rem .35rem;
+      width: 100%;
+      max-width: 540px;
+      margin: .25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      transition: border-color 0.2s;
+    }
+    .card:hover { border-color: var(--accent); }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      /*margin-bottom: 2rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--debug);*/
+    }
+
+    .card-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink);
+      font-family: 'Syne', sans-serif;
+    }
+    .card-value {
+      font-size: 2rem;
+      font-weight: 500;
+      line-height: 1;
+    }
+    .card-delta {
+      font-size: 0.75rem;
+      color: var(--accent);
+    }
+    .card-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 0.25rem;
+    }
+/* ── Form layout: stacked rows, inputs right-aligned ── */
+    .form-fields {
+      display: flex;
+      flex-direction: column;
+      border-radius: 1px;
+      border-color: var(--border);
+      border-width: 10px;
+      gap: var(--gap);
+    }
+
+    .field {
+      display: flex;
+      align-items: center;
+      border-radius: 1px;
+      gap: var(--gap);
+    }
+    .field label {
+      flex: 0 0 var(--label-w);
+      text-align: right;          /* right-align label text toward the input */
+      font-family: var(--font-body);
+      font-size: .78rem;
+      color: var(--ink);
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      user-select: none;
+    }
+
+    /* inputs pushed to the right via margin-left: auto on their wrapper */
+    .field .input-wrap {
+      flex: 1;
+      display: flex;
+      justify-content: flex-end;  /* right-align the input within remaining space */
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      max-width: var(--input-max);
+      background: var(--primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      font-size: .88rem;
+      padding: .55rem .75rem;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+      appearance: none;
+    }
+
+    .field input::placeholder { color: var(--muted); opacity: .7; }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-dim);
+    }
+
+    /* select arrow */
+    .field select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238b949e' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right .65rem center;
+      padding-right: 2rem;
+    }
+
+    /* divider between address block and city/state/zip row */
+    .field-divider {
+      border: none;
+      border-top: 1px dashed var(--border);
+      margin: .25rem 0;
+    }
+
+    /* ── Submit row ── */
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;   /* button right-aligned */
+      margin-top: 1.75rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn-submit {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      background: var(--accent);
+      color: #0d1117;
+      font-family: var(--font-mono);
+      font-size: .82rem;
+      font-weight: 700;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      border: none;
+      border-radius: var(--radius);
+      padding: .65rem 1.4rem;
+      cursor: pointer;
+      transition: opacity .15s, transform .1s;
+    }
+    .btn-submit:hover { opacity: .85; }
+    .btn-submit:active { transform: scale(.97); }
+    .btn-submit:disabled { opacity: .5; cursor: not-allowed; }
+
+    .error-message {
+      color: var(--accent);
+      font-style: italic bold;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+    /* Weather Card formating */
+    .weather-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+  }
+
+  .weather-header p { margin: 0; }
+
+    /* ── Desktop Nav (>=700px) ─────────────────────── */
+    /* Nav leaves the dropdown and sits centered in bar  */
+    @media (min-width: 700px) {
+      .nav-toggle { display: none; }
+      .container {
+        flex-direction: row;
+      }
+      /* Re-position to center of the header bar */
+      .nav-drawer {
+        /* override all mobile positioning */
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        right: auto;
+        transform: translate(-50%, -50%);
+
+        /* always visible */
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        transform: translate(-50%, -50%) !important;
+
+        /* reset dropdown chrome */
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        min-width: 0;
+        white-space: normal;
+        overflow: visible;
+      }
+
+      .nav-drawer ul {
+        display: flex;
+        gap: 0.25rem;
+        padding: 0;
+        margin: 0;
+      }
+
+      .nav-drawer li { border: none; }
+
+      .nav-drawer a {
+        padding: 0.4rem 0.9rem;
+        font-size: 1.0rem;
+        border-radius: 6px;
+        position: relative;
+        color: var(--primary);
+      }
+
+      .nav-drawer a::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0.9rem;
+        right: 0.9rem;
+        height: 2px;
+        background: var(--accent);
+        transform: scaleX(0);
+        transition: transform 0.25s var(--ease-out);
+      }
+
+      .nav-drawer a:hover,
+      .nav-drawer a.active {
+        padding-left: 0.9rem;
+        background: var(--header-border);
+        color: var(--accent);
+      }
+
+      .nav-drawer a:hover::after,
+      .nav-drawer a.active::after {
+        transform: scaleX(1);
+      }
+    }

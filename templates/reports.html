@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Dashboard</h1>
+
+<!--
+  hx-get      → endpoint to call
+  hx-trigger  → when to trigger (load = immediately on page load)
+  hx-target   → where to swap the response HTML
+  hx-swap     → how to swap (innerHTML replaces the inside of the target)
+-->
+<section id="reports-container"
+         hx-get="/partials/reports"
+         hx-trigger="load"
+         hx-swap="innerHTML">
+    <p>Loading reports...</p>
+</section>
+
+
+{% endblock %}
