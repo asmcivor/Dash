@@ -13,7 +13,8 @@ your HTMX attributes at those routes.
 from __future__ import annotations
 
 import time
-from services.address_service import Address # Import the Address class from the address_service module
+#from services.address_service import Address, AddressProcessor # Import the Address class from the address_service module
+from services.address_service import Address, AddressProcessor   
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
@@ -35,7 +36,9 @@ class SpeedUnit(str, Enum):
     MPH  = "mph"
     KMPH = "kmh"
 
-
+class weather_code(str,Enum):
+    TEXT = "text"
+    ICON = "icon"
 
 @dataclass
 class WeatherReading:
@@ -261,7 +264,7 @@ class WeatherProcessor:
             temp_unit   = TempUnit.FAHRENHEIT,
             speed_unit  = SpeedUnit.MPH,
             humidity    = current.get("relative_humidity_2m"),
-            description = _weather_code_to_text(current.get("weather_code", 0)),
+            description = self._weather_code_to_text(current.get("weather_code", 0)),
         )
 
     def _add_to_history(self, reading: WeatherReading) -> None:
@@ -281,18 +284,43 @@ class WeatherProcessor:
 # ---------------------------------------------------------------------------
 # Utility: WMO weather-code → description
 # ---------------------------------------------------------------------------
+    def getweatherdescription(self, code: int, weather_type: str) -> str:
+        _WeatherMAP = {
+        0: {"text": "Clear sky", "icon": "wi-day-sunny"},
+        1: {"text": "Mainly clear", "icon": "wi-day-cloudy"},
+        2: {"text": "Partly cloudy", "icon": "wi-cloudy"},
+        3: {"text": "Overcast", "icon": "wi-fog"},
+        45: {"text": "Fog", "icon": "wi-fog"},
+        48: {"text": "Rime fog", "icon": "wi-rain-mix"},
+        51: {"text": "Light drizzle", "icon": "wi-rain"},
+        53: {"text": "Drizzle", "icon": "wi-rain"},
+        55: {"text": "Heavy drizzle", "icon": "wi-rain"},
+        61: {"text": "Light rain", "icon": "wi-rain"},
+        63: {"text": "Rain", "icon": "wi-rain"},
+        65: {"text": "Heavy rain", "icon": "wi-rain"},
+        71: {"text": "Light snow", "icon": "wi-snow"},
+        73: {"text": "Snow", "icon": "wi-snow"},
+        75: {"text": "Heavy snow", "icon": "wi-snow"},
+        95: {"text": "Thunderstorm", "icon": "wi-thunderstorm"},
+        96: {"text": "Thunderstorm w/ hail", "icon": "wi-thunderstorm"},
+        99: {"text": "Heavy thunderstorm", "icon": "wi-thunderstorm"},
+        }
+        return _WeatherMAP.get(code, {"text": f"Unknown code {code}", "icon": f"Unknown code {code}"}).get(weather_type)
 
-def _weather_code_to_text(code: int) -> str:
-    _MAP = {
-        0: "Clear sky", 1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast",
+    def _weather_code_to_text(self, code: int) -> str:
+    # create a dictionary that maps the weather codes to their correspond text and icon
+    # descriptions
+        _MAP = {
+        0: "Clear sky", 
+        1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast",
         45: "Fog", 48: "Rime fog",
         51: "Light drizzle", 53: "Drizzle", 55: "Heavy drizzle",
         61: "Light rain", 63: "Rain", 65: "Heavy rain",
         71: "Light snow", 73: "Snow", 75: "Heavy snow",
         80: "Rain showers", 81: "Showers", 82: "Heavy showers",
         95: "Thunderstorm", 96: "Thunderstorm w/ hail", 99: "Heavy thunderstorm",
-    }
-    return _MAP.get(code, f"Weather code {code}")
+        }
+        return _MAP.get(code, f"Weather code {code}")
 
 
 # ---------------------------------------------------------------------------
@@ -302,8 +330,10 @@ def _weather_code_to_text(code: int) -> str:
 if __name__ == "__main__":
     processor = WeatherProcessor()
 
+    print(f" getting icon for {processor.getweatherdescription(0,weather_code.ICON)}")
     print("Fetching weather for Portland, OR …")
-    reading = processor.get_current("Portland")
+    address = Address(street="37032 Salmonberry Street", city="Sandy", state="OR", zip_code="97055", country="US")
+    reading = processor.get_current(address)
     print(f"  {reading.location}: {reading.temperature}°F, "
           f"wind {reading.wind_speed} mph, {reading.description}")
 

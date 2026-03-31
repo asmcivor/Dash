@@ -44,7 +44,7 @@
                     <circle cx="12" cy="11" r="3"/>
                     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
                 </svg>
-                <div class="card-label"><h3>Location</h3></div>
+                <div><h3  class="card-label">Location</h3></div>
             </div>  
         </div>
         <form id="address-form" 
@@ -91,55 +91,29 @@
         </form>
     </div>
     <div class="column">
-        <div class="weather-header"> 
-            <p class="card-label">Current Weather </p>
-            <secton id="weather-container" class="card-label"
-                hx-get="/partials/current_time"
-                hx-trigger="load"
-                hx-swap="innerHTML">
-                <p>Loading time...</p>
-            </secton>
-        </div>
+        <div class="card">
+            <div class="card-header">   
+                <div ><h4>Current Weather</h4></div>
+                    <section id="weather-container" 
+                        hx-get="/partials/current_time"
+                        hx-trigger="load"
+                        hx-swap="innerHTML">
+                        <p>Loading time...</p>
+                    </section>
+            </div> <!-- Card Header -->
+        </div> <!-- Card -->
         <div id="weather-result"></div>
-    </div>
+    </div> <!-- Column -->
 </div>
-    
+<div class="container">
+    <div class="column">
+        <div class="card">
+            <div class="card-header">   
+                <div><h3 class="card-label">Data Table</h3></div>
+        
+            </div> 
+        </div>
+    </div>  
+</div>
 
-<!--    
-<section id="stats-container"
-         hx-get="/partials/stats"
-         hx-trigger="load"
-         hx-swap="innerHTML">
-        <P>loading Stats...</P>
-</section>
-
-<section>
-    <h2>Data Table</h2>
-    <div id="data-table"
-         hx-get="/partials/table?page=1"
-         hx-trigger="load"
-         hx-swap="innerHTML">
-        <p>Loading table...</p>
-    </div>
-</section>
-<secton>
-    <h2>Time</h2>
-    <div id="time-container"
-         hx-get="/partials/current_time"
-         hx-trigger="load"
-         hx-swap="innerHTML">
-        <p>Loading time...</p>
-    </div>
-</secton>
-</secton>
-<section>
-    <h2>Add Item</h2>
-    <form hx-post="/partials/item"
-          hx-target="#items-list"
-          hx-swap="afterbegin">
-        <input type="text" name="name" placeholder="Item name" required>
-        <button type="submit">Add</button>
-    </form>
-    <ul id="items-list"></ul>
-</section> -->
 {% endblock %}

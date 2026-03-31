@@ -47,17 +47,20 @@ async def LatLong_partial(
         )
 # if data is ok then get the weather for the address
     currentWeather = WeatherProcessor().get_current(address)
+    # calculat the icon
+    icon = f"wi-day-sunny"
     if currentWeather is None:
         logger.error("Failed to retrieve weather information.")
         addressdata = f"{street}, {city}, {state}, {zip_code}, {country}."
+        
         return templates.TemplateResponse(
             "partials/weatherError.html",   
-            {"request": request, "addressdata": addressdata},
+            {"request": request, "addressdata": addressdata, "icon": icon},
         )
     
     return templates.TemplateResponse(
         "partials/weather.html",
-        {"request": request, "currentWeather": currentWeather},
+        {"request": request, "currentWeather": currentWeather, "icon": icon},
     )
 #route for the time service
 @router.get("/current_time", response_class=HTMLResponse)

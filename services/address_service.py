@@ -15,7 +15,7 @@ from venv import logger
 #logging setup
 def setup_logging():
     logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
 
     formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 
@@ -72,6 +72,8 @@ class AddressProcessor:
     @staticmethod
     def quote_keep_plus(s, safe, encoding, errors):
         return quote(s, safe='+', encoding=encoding, errors=errors)
+    
+
     
     def _fetch_from_api(self, a: Address) -> Address:
         """

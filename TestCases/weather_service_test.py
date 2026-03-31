@@ -1,7 +1,18 @@
 import unittest
-import pytest  
-from weather_service import WeatherProcessor, WeatherReading, TempUnit, SpeedUnit
-from address_service import Address, AddressProcessor
+import logging
+from services.weather_service import WeatherProcessor, WeatherReading, TempUnit, SpeedUnit, weather_code
+from services.address_service import Address, AddressProcessor
+
+def setup_logging():
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)
+
+    formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+
+    logger.addHandler(console_handler)
 
 class TestWeatherReading(unittest.TestCase):
 
@@ -45,16 +56,62 @@ class TestWeatherReading(unittest.TestCase):
         )
         self.assertAlmostEqual(reading.temp_in(TempUnit.FAHRENHEIT), 98.6, places=1)
 
-    def test_validLocation(self):
-        reading_location = WeatherReading(
-            location="abcd",
-            temperature=70.0,
-            wind_speed=5.0,
-            temp_unit=TempUnit.FAHRENHEIT,
-            speed_unit=SpeedUnit.MPH,
-        )
-        self.assertNotEqual(reading_location.location, "New York") 
     
+    
+    def test_WeatherIcon_0(self):
+        icon = WeatherProcessor().getweatherdescription(0, weather_code.ICON)
+        self.assertEqual(icon, "wi-day-sunny")
+
+    def test_WeatherIcon_1(self):
+        icon = WeatherProcessor().getweatherdescription(1,weather_code.ICON)
+        self.assertEqual(icon, "wi-day-cloudy")
+    def test_WeatherIcon_2(self):
+        icon = WeatherProcessor().getweatherdescription(2,weather_code.ICON)
+        self.assertEqual(icon, "wi-cloudy")
+
+    def test_WeatherIcon_3(self):
+        icon = WeatherProcessor().getweatherdescription(3,weather_code.ICON)  
+        self.assertEqual(icon, "wi-fog")
+
+    def test_WeatherIcon_45(self):
+        icon = WeatherProcessor().getweatherdescription(45,weather_code.ICON)
+        self.assertEqual(icon, "wi-fog")
+
+    def test_WeatherIcon_48(self):
+        icon = WeatherProcessor().getweatherdescription(48,weather_code.ICON)
+        self.assertEqual(icon, "wi-rain-mix")
+    def test_WeatherIcon_51(self):
+        icon = WeatherProcessor().getweatherdescription(51,weather_code.ICON)
+        self.assertEqual(icon, "wi-rain") 
+    def test_WeatherIcon_53(self):
+        icon = WeatherProcessor().getweatherdescription(53,weather_code.ICON)
+        self.assertEqual(icon, "wi-rain")
+    def test_WeatherIcon_55(self):
+        icon = WeatherProcessor().getweatherdescription(55,weather_code.ICON)
+        self.assertEqual(icon, "wi-rain")
+    def test_WeatherIcon_61(self):
+        icon = WeatherProcessor().getweatherdescription(61,weather_code.ICON)
+        self.assertEqual(icon, "wi-rain")
+    def test_WeatherIcon_63(self):
+        icon = WeatherProcessor().getweatherdescription(63,weather_code.ICON)
+        self.assertEqual(icon, "wi-rain")
+    def test_WeatherIcon_65(self):
+        icon = WeatherProcessor().getweatherdescription(65,weather_code.ICON)
+        self.assertEqual(icon, "wi-rain")
+    def test_WeatherIcon_71(self):
+        icon = WeatherProcessor().getweatherdescription(71,weather_code.ICON)
+        self.assertEqual(icon, "wi-snow")
+
+
+    def test_validLocation(self):
+        # partial Locatoin
+        aproc = AddressProcessor()
+        address = Address(city="Sandy", state="OR", country="US")
+        wproc = WeatherProcessor()
+        weatheraddress = aproc.get_addressByPostalCode(address)
+        reading_location = wproc.get_current(weatheraddress)
+        self.assertNotEqual(reading_location.location, "New York") 
+
     def test_validLocation2(self):
         aproc = AddressProcessor()
         address = Address(street="37032 Salmonberry Street", city="Sandy", state="OR", zip_code="97055", country="US")

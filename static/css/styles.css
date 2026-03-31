@@ -44,6 +44,10 @@
       color: var(--ink);
       font-family: var(--font-body);
     }
+    h1 h2 h3 h4 h5 h6 {
+      font-family: var(--font-display);
+      color: var(--ink);
+    }
 
     /* ── Header Shell ──────────────────────────────── */
     /* position:relative so the mobile dropdown can be  */
@@ -243,7 +247,7 @@
     }      /* always full width */
 
 /* ─────────────────────────────────────────
-       CARD
+       CARDS
     ───────────────────────────────────────── */
 
     .card {
@@ -265,9 +269,6 @@
       display: flex;
       align-items: center;
       gap: .75rem;
-      /*margin-bottom: 2rem;
-      padding-bottom: 1.25rem;
-      border-bottom: 1px solid var(--debug);*/
     }
 
     .card-label {
@@ -275,7 +276,7 @@
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--ink);
-      font-family: 'Syne', sans-serif;
+      font-family: var(--font-body);
     }
     .card-value {
       font-size: 2rem;
@@ -293,6 +294,34 @@
       letter-spacing: 0.05em;
       color: var(--muted);
       margin-bottom: 0.25rem;
+    }
+/* weather styles */
+    .weather-icon {
+      font-size: 80px;
+      color: var(--header-border);
+    } 
+
+  .addtemp {
+	  font-size: .75rem;
+    margin: .5rem;
+    /* border: 1px solid var(--debug); */
+	  color: var(--ink-muted);
+  }
+  .maintemp {
+    margin: 0px;
+	  font-size: 2.5rem;
+    font-weight: bold;
+	  color: var(--header-border);
+  }
+  .circlecard {
+	  display: grid;
+      align-items: center;
+      justify-items: center;
+      background: var(--primary);
+      border: 4px solid var(--header-border);
+      border-radius: 50%;
+      width: 150px;
+	  height: 150px;
     }
 /* ── Form layout: stacked rows, inputs right-aligned ── */
     .form-fields {
@@ -407,6 +436,8 @@
     .weather-header {
       display: flex;
       align-items: center;
+      border-bottom: var(--header-border) solid 1px;
+      margin-bottom: 1rem;
       gap: 0.5rem;
   }
 

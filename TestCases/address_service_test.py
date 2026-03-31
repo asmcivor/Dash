@@ -1,7 +1,7 @@
 import unittest
 import pytest 
 import logging
-from address_service import Address, AddressProcessor
+from services.address_service import Address, AddressProcessor
 
 
 def setup_logging():
