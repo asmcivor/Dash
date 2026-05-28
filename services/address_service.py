@@ -63,8 +63,17 @@ class AddressProcessor:
         address = self._fetch_from_api(address)   
         if address is None:
             return None
-        self._latest = address
-        return address
+        else:
+            # insure we have a list
+            address_l = [address] if isinstance(address, dict) else address
+            #if len(address_l) == 1:
+             #   address = address_l [0]
+              #  return address
+            #else:
+             #   self.logger.warning("Multiple addresses found for postal code: %s. Returning the first one.", address[0])
+              #  return address
+        self._latest = address_l
+        return address_l
  
  # ------------------------------------------------------------------
     # Private helpers
@@ -75,7 +84,7 @@ class AddressProcessor:
     
 
     
-    def _fetch_from_api(self, a: Address) -> Address:
+    def _fetch_from_api(self, a: Address) -> Optional[Address]:
         """
         based on the address components provided build up a location string to
         call the geocoding API. The API will return a list of possible matches. 
@@ -113,38 +122,29 @@ class AddressProcessor:
         with urllib.request.urlopen(address_url, timeout=10) as resp:
             address_data = json.loads(resp.read())
         self.logger.debug("Address data:%s ", address_data)
-        for i in range(len(address_data)):
-            self.logger.debug("i: %d, postcode: %s", i, address_data[i].get("address",{}).get("postcode", ""))
-            if address_data[i].get("address",{}).get("postcode", "") == a.zip_code:
-                self.logger.debug("Found matching postal code: %s at index %d", location, i)
-                break
+        if address_data == None:
+            return None
         else:
-            self.logger.debug("No matching postal code found for: %s", location)
-            return None 
-        result = address_data[i]  # take the ith result
-        self.logger.debug("Final result: %s", result)
-        return Address(
-            lat=float(result.get("lat", "")),    
-            long=float(result.get("lon", "")),
-            street=result.get("address",{}).get("house_number", "") + " " + result.get("address", {}).get("road", ""),
-            city=result.get("address", {}).get("town", ""),
-            state=result.get("address", {}).get("state", ""), 
-            zip_code=result.get("address", {}).get("postcode", ""),
-            country=result.get("address", {}).get("country_code", "")
-        )
+            return address_data  # Calling function is responsible for determining how many results
+        
 
 
 if __name__ == "__main__":
     setup_logging()
-    add = Address("37032 Salmonberry St", "Sandy", "OR", "97055", "US")
-    processor = AddressProcessor()
-    address = processor.get_addressByPostalCode(add) 
-    print(address)
-    add2 = Address("", "", "", "97055", "US")
-    print(f"address is {add2.street} before setting zip code and country") 
-    address2 = processor.get_addressByPostalCode(add2) 
-    print(f"address2 is {address2}")
-    #address = processor.get_addressByPostalCode("97055", "US")
-    #print(address)
-    #address = processor.get_addressByPostalCode("00000", "US")
-    #print(address)
+    address_processor  = AddressProcessor()
+    address = address_processor.get_addressByPostalCode(Address(street="", city="", state="", zip_code="97055", country="US"))
+    print(f"address object is {type(address)}")
+    print(f"address is {address}")
+    for i in range(len(address)):
+        # get the first address
+        address_detail = address[i].get("address",{})
+        # get the key elemens in address detail
+        house_number = address_detail.get("house_number", "")
+        road = address_detail.get("road", "")
+        city = address_detail.get("city", "") or address_detail.get("town", "") or address_detail.get("village", "")
+        state = address_detail.get("state", "")
+        postcode = address_detail.get("postcode", "") or address_detail.get("postal_code", "")
+        country_code = address_detail.get("country_code", "")
+
+        print(f"address returned is {house_number} {road}, {city}, {state} {postcode}, {country_code}")
+    
