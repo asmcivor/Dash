@@ -13,6 +13,8 @@ your HTMX attributes at those routes.
 from __future__ import annotations
 
 import time
+
+from fastapi import logger
 #from services.address_service import Address, AddressProcessor # Import the Address class from the address_service module
 from services.address_service import Address, AddressProcessor   
 from dataclasses import dataclass, field
@@ -21,7 +23,24 @@ from typing import Optional
 import urllib.request
 import urllib.parse
 import json
+import logging
+from venv import logger
 
+#logging setup
+def setup_logging():
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)
+
+    formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+
+    file_handler = logging.FileHandler("app.log", mode="a")
+    file_handler.setFormatter(formatter)
+
+    logger.addHandler(console_handler)
+    logger.addHandler(file_handler)
 
 # ---------------------------------------------------------------------------
 # Supporting types
@@ -31,6 +50,9 @@ class TempUnit(str, Enum):
     CELSIUS    = "celsius"
     FAHRENHEIT = "fahrenheit"
 
+class TempChar(str, Enum):
+    C = "C"
+    F = "F"
 
 class SpeedUnit(str, Enum):
     MPH  = "mph"
@@ -40,18 +62,47 @@ class weather_code(str,Enum):
     TEXT = "text"
     ICON = "icon"
 
+
 @dataclass
 class WeatherReading:
     """A single weather observation snapshot."""
     location:       str
+    lat:            float = 0.0
+    lon:            float = 0.0
     temperature:    float
     wind_speed:     float
     temp_unit:      TempUnit  = TempUnit.FAHRENHEIT
+    temp_char:      TempChar = TempChar.F
     speed_unit:     SpeedUnit = SpeedUnit.MPH
     description:    str       = ""
     humidity:       float | None = None   # percent value is a float with no default value and none is acceptable
-    timestamp:      float     = field(default_factory=time.time)  # gets the time with every creation of the object
+    timestamp:      float     = field(default_factory=time.time)
+    elevation:      float     = 0.0   # gets the time with every creation of the object
+    
+    @classmethod
+    def from_api_response(cls, data: dict) -> WeatherReading:
+        logger.debug("Processing API response: %s", data)
+        weather_units = data.get("current_units", {})
+        weather_current = data.get("current", {})
 
+        try:
+            return cls(
+            location=data.get("location", ""),
+            temperature=weather_current.get("temperature_2m", 0.0),
+            wind_speed=weather_current.get("wind_speed_10m", 0.0),
+            # update this section to handle C/F
+            temp_unit=TempUnit.FAHRENHEIT,
+            temp_char=TempChar.F,
+            speed_unit=SpeedUnit.MPH,
+            description=data.get("description", ""),
+            humidity=data.get("humidity",""),
+            lat=data.get("latitude", 0.0),
+            lon=data.get("longitude", 0.0),
+            )
+        except (ValueError, TypeError) as e:
+            logger.error("Error processing API response: %s", e)
+            return None
+    
     # --- convenience conversions -------------------------------------------
 
     def temp_in(self, unit: TempUnit) -> float:
@@ -128,7 +179,7 @@ class WeatherProcessor:
     # Public API — each method is one HTMX endpoint
     # ------------------------------------------------------------------
 
-    def get_current(self, location: str) -> WeatherReading:
+    def get_current(self, location: Address) -> WeatherReading:
         """
         Fetch current weather for *location* and cache it.
 
@@ -244,7 +295,7 @@ class WeatherProcessor:
             "https://api.open-meteo.com/v1/forecast?"
             + urllib.parse.urlencode({
                 "latitude":  location.lat,
-                "longitude": location.long,
+                "longitude": location.lon,
                 "current":   "temperature_2m,wind_speed_10m,relative_humidity_2m,weather_code",
                 "temperature_unit": "fahrenheit",
                 "wind_speed_unit":  "mph",
@@ -328,21 +379,8 @@ class WeatherProcessor:
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    processor = WeatherProcessor()
+    setup_logging()
+    wproc = WeatherProcessor()
+    
 
-    print(f" getting icon for {processor.getweatherdescription(0,weather_code.ICON)}")
-    print("Fetching weather for Portland, OR …")
-    address = Address(street="37032 Salmonberry Street", city="Sandy", state="OR", zip_code="97055", country="US")
-    reading = processor.get_current(address)
-    print(f"  {reading.location}: {reading.temperature}°F, "
-          f"wind {reading.wind_speed} mph, {reading.description}")
-
-    print("\nSwitching to metric …")
-    processor.set_units(TempUnit.CELSIUS, SpeedUnit.KMPH)
-    temp_c = reading.temp_in(TempUnit.CELSIUS)
-    wind_k = reading.wind_in(SpeedUnit.KMPH)
-    print(f"  {temp_c:.1f}°C, {wind_k:.1f} km/h")
-
-    alerts = processor.check_alerts()
-    print(f"\nAlerts: {alerts or 'None'}")
-    print(f"\nSummary: {processor.summarize()}")
+    

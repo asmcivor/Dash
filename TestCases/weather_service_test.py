@@ -1,6 +1,6 @@
 import unittest
 import logging
-from services.weather_service import WeatherProcessor, WeatherReading, TempUnit, SpeedUnit, weather_code
+from services.weather_service import WeatherProcessor, WeatherReading, TempUnit, TempChar,SpeedUnit, weather_code
 from services.address_service import Address, AddressProcessor
 
 def setup_logging():
@@ -106,17 +106,19 @@ class TestWeatherReading(unittest.TestCase):
     def test_validLocation(self):
         # partial Locatoin
         aproc = AddressProcessor()
-        address = Address(city="Sandy", state="OR", country="US")
+        address = Address(city="Sandy", state="OR", zip_code="97055", country="US")
         wproc = WeatherProcessor()
-        weatheraddress = aproc.get_addressByPostalCode(address)
-        reading_location = wproc.get_current(weatheraddress)
-        self.assertNotEqual(reading_location.location, "New York") 
+        addressresponse = aproc.get_addressByPostalCode(address)
+        weather_response = wproc.get_current(Address.from_api_response(addressresponse[0]))
+        current_weather = WeatherReading.from_api_response(weather_response[0])
+        self.assertAlmostEqual(current_weather.lat, 45.412, places=2)  
+        self.assertAlmostEqual(current_weather.lon, -122.280, places=2)
 
     def test_validLocation2(self):
         aproc = AddressProcessor()
-        address = Address(street="37032 Salmonberry Street", city="Sandy", state="OR", zip_code="97055", country="US")
+        address_repsonse = Address(street="37032 Salmonberry Street", city="Sandy", state="OR", zip_code="97055", country="US")
         wproc = WeatherProcessor()
-        weatheraddress = aproc.get_addressByPostalCode(address)
+        weatheraddress = aproc.get_addressByPostalCode(Address.from_api_response(address_repsonse))
         reading_location = wproc.get_current(weatheraddress)
         self.assertEqual(reading_location.location, "37032 Salmonberry Street, Sandy, Oregon 97055, us")
 
