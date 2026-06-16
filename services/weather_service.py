@@ -12,9 +12,10 @@ your HTMX attributes at those routes.
 
 from __future__ import annotations
 
+from os import read
 import time
 
-from fastapi import logger
+#from fastapi import logger
 #from services.address_service import Address, AddressProcessor # Import the Address class from the address_service module
 from services.address_service import Address, AddressProcessor   
 from dataclasses import dataclass, field
@@ -66,11 +67,11 @@ class weather_code(str,Enum):
 @dataclass
 class WeatherReading:
     """A single weather observation snapshot."""
-    location:       str
+    location:       str  # built from the address record used in the search
     lat:            float = 0.0
     lon:            float = 0.0
-    temperature:    float
-    wind_speed:     float
+    temperature:    float = 0.0
+    wind_speed:     float = 0.0
     temp_unit:      TempUnit  = TempUnit.FAHRENHEIT
     temp_char:      TempChar = TempChar.F
     speed_unit:     SpeedUnit = SpeedUnit.MPH
@@ -80,24 +81,24 @@ class WeatherReading:
     elevation:      float     = 0.0   # gets the time with every creation of the object
     
     @classmethod
-    def from_api_response(cls, data: dict) -> WeatherReading:
-        logger.debug("Processing API response: %s", data)
-        weather_units = data.get("current_units", {})
-        weather_current = data.get("current", {})
+    def from_api_response(cls, weather: dict, address: Address) -> WeatherReading:
+        logger.debug("Processing API response: %s", weather)
+        weather_units = weather.get("current_units", {})
+        weather_current = weather.get("current", {})
 
         try:
             return cls(
-            location=data.get("location", ""),
+            location=f"{address.house_number} {address.street}, {address.city}, {address.state} {address.zip_code}, {address.country}",
             temperature=weather_current.get("temperature_2m", 0.0),
             wind_speed=weather_current.get("wind_speed_10m", 0.0),
             # update this section to handle C/F
             temp_unit=TempUnit.FAHRENHEIT,
             temp_char=TempChar.F,
             speed_unit=SpeedUnit.MPH,
-            description=data.get("description", ""),
-            humidity=data.get("humidity",""),
-            lat=data.get("latitude", 0.0),
-            lon=data.get("longitude", 0.0),
+            description=weather.get("description", ""),
+            humidity=weather.get("humidity",""),
+            lat=weather.get("latitude", 0.0),
+            lon=weather.get("longitude", 0.0),
             )
         except (ValueError, TypeError) as e:
             logger.error("Error processing API response: %s", e)
@@ -168,6 +169,8 @@ class WeatherProcessor:
         speed_unit: SpeedUnit  = SpeedUnit.MPH,
         history_limit: int     = 50,
     ) -> None:
+        self.logger = logging.getLogger(__name__)
+        self.logger.info("Initializing WeatherProcessor")
         self.api_key       = api_key
         self.temp_unit     = temp_unit
         self.speed_unit    = speed_unit
@@ -185,14 +188,16 @@ class WeatherProcessor:
 
         HTMX:  hx-get="/weather/current?location={location}"
         """
-        reading = self._fetch_from_api(location)
-        if reading is None:
-            raise ValueError(f"Could not fetch weather for location: {location}")
+        weather_response = self._fetch_from_api(location)
+        if weather_response is None:
             return None
+        else:
+            weather_l = [weather_response] if isinstance(weather_response, dict) else weather_response 
         
-        self._latest = reading
-        self._add_to_history(reading)
-        return reading
+    
+        self._latest = weather_l
+        self._add_to_history(weather_l)
+        return weather_l
 
     def get_history(
         self,
@@ -306,17 +311,11 @@ class WeatherProcessor:
         with urllib.request.urlopen(wx_url, timeout=10) as resp:
             wx_data = json.loads(resp.read())
 
-        current = wx_data["current"]
-
-        return WeatherReading(
-            location    = f"{location.street}, {location.city}, {location.state} {location.zip_code}, {location.country}",
-            temperature = current["temperature_2m"],
-            wind_speed  = current["wind_speed_10m"],
-            temp_unit   = TempUnit.FAHRENHEIT,
-            speed_unit  = SpeedUnit.MPH,
-            humidity    = current.get("relative_humidity_2m"),
-            description = self._weather_code_to_text(current.get("weather_code", 0)),
-        )
+        self.logger.debug("Weather data fetched: %s", wx_data)
+        if wx_data == None:
+            return None
+        else:
+            return wx_data
 
     def _add_to_history(self, reading: WeatherReading) -> None:
         self._history.append(reading)
