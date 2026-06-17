@@ -92,9 +92,8 @@ class WeatherReading:
             temperature=weather_current.get("temperature_2m", 0.0),
             wind_speed=weather_current.get("wind_speed_10m", 0.0),
             # update this section to handle C/F
-            temp_unit=TempUnit.FAHRENHEIT,
-            temp_char=TempChar.F,
-            speed_unit=SpeedUnit.MPH,
+            temp_unit=TempUnit.FAHRENHEIT.name,
+            speed_unit=SpeedUnit.MPH.name,
             description=weather.get("description", ""),
             humidity=weather.get("humidity",""),
             lat=weather.get("latitude", 0.0),

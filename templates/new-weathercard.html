@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <!--<link rel="stylesheet" href="/static/css/styles.css"> -->
+</head>
+</head>
+<style>
+:root {
+    --primary:       #fdf0e8;
+    --ink:           #2e1a20;
+    --ink-muted:     #4b4748;
+    --secondary:     #e8c8c0;
+    --header-bg:     #7a3a4a;
+    --header-border: #a05060;
+    --boarder:        #d39c69;
+    --accent:        #e8856a;
+    --debug: red;
+    --gap: .5rem;
+    --label-w: 120px;
+    --input-max: 320px;
+    --radius:       8px;
+    --nav-h:         100px;
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body:    'DM Sans', sans-serif;
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+.container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 1rem;
+      background-color: var(--primary);
+    }
+
+.column {
+      flex: 1;
+      padding: .5rem;
+      background: var(--secondary);
+      border-radius: 8px;
+    }
+</style
+<body>
+<div class="container">
+	<p>time here</p>
+    <div class="column">
+        <div class="card">
+			<p>lowtemp° | hightemp °</p>
+			<P>temp Large font</p>
+			<p>feels like windtemp°</p>
+		</div> <!-- card -->
+	</div> <!-- column 1 -->
+	<div class="column">
+		<div class="card">
+			<p>wind and sky icons</p>
+		</div>
+	</div> <!-- column 2 -->
+</div>
+</body>
+
+	
+

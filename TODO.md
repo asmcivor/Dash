@@ -1,9 +1,11 @@
 # Weather App — TODO
 
 ## In Progress
-- [ ] Fix weather tests.
+- [X ] Update code to use updated address and weather service
+- [ ] Have the webpage handle multiple responses from the get adddress call.
+- [X] Fix weather tests.
 - [X] Implement Weather class method to populate key fields
-- [ ] Cleaner way to create an address directly from the address response.
+- [X] Cleaner way to create an address directly from the address response.
 - [X] Figure out where the response from the API should be converted into a data object (list) to be used by the app.  Have the api call convert it or the calling funtion?
 - [ ] Implement `weather_code_to_string` for remaining weather codes (TDD red-green-refactor)
 - [X] The get forecast from api.open-meteo.com is expecting a lat and a long.  But in some cases they are null.  The get Address by postal code is not returning a true Address object but the response from the API call.  Do we convert the response to only get the data we need or modify to pull the data from the response.
@@ -33,6 +35,7 @@
 - [ ] Finishing migrating weather_service_test.py
 
 ### Frontend / CSS
+
 - [ ] Revisit flexbox layout on mobile viewports
 - [ ] Confirm inline vs external styles are consistent across all templates
 - [ ] Review partial vs full-page template split for any redundancy

@@ -36,9 +36,10 @@ async def LatLong_partial(
     First get the address data from the form
     """
     logger.debug(f"Received form data: street={street}, city={city}, state={state}, zip_code={zip_code}, country={country}")
-    service = AddressProcessor()
-    address = service.get_addressByPostalCode(Address(street=street, city=city, state=state, zip_code=zip_code, country=country))
-    if address is None: 
+    aproc = AddressProcessor()
+    wproc = WeatherProcessor()
+    addressresponse = aproc.get_addressByPostalCode(Address(street=street, city=city, state=state, zip_code=zip_code, country=country))
+    if addressresponse is None: 
         logger.error("Failed to retrieve address information.")
         addressdata = f"{street}, {city}, {state}, {zip_code}, {country}."
         return templates.TemplateResponse(
@@ -46,10 +47,13 @@ async def LatLong_partial(
             {"request": request, "addressdata": addressdata},
         )
 # if data is ok then get the weather for the address
-    currentWeather = WeatherProcessor().get_current(address)
+# At this point assuming only 1 address is returned from the address service, so we take the first one.
+    weather_address = Address.from_api_response(addressresponse[0])
+    weather_response = wproc.get_current(weather_address)
+    current_weather = WeatherReading.from_api_response(weather_response[0], weather_address)
     # calculat the icon
     icon = f"wi-day-sunny"
-    if currentWeather is None:
+    if current_weather is None:
         logger.error("Failed to retrieve weather information.")
         addressdata = f"{street}, {city}, {state}, {zip_code}, {country}."
         
@@ -60,7 +64,7 @@ async def LatLong_partial(
     
     return templates.TemplateResponse(
         "partials/weather.html",
-        {"request": request, "currentWeather": currentWeather, "icon": icon},
+        {"request": request, "current_weather": current_weather, "icon": icon},
     )
 #route for the time service
 @router.get("/current_time", response_class=HTMLResponse)

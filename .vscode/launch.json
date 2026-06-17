@@ -10,6 +10,18 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal"
+        },
+        {
+            "name": "FastAPI Debug",
+            "type": "debugpy",
+            "request": "launch",
+                  "module": "uvicorn",
+            "args": [
+                "main:app",
+                "--port", "8000"
+            ],
+            "jinja": true,
+            "justMyCode": true
         }
-    ]
+  ]
 }
