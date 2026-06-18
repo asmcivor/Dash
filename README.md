@@ -1,0 +1,1 @@
+This app is a basic app to learn python and fastapi web development
