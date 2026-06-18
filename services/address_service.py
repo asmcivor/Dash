@@ -12,6 +12,7 @@ from functools import partial
 import json
 import logging
 from venv import logger
+from config import settings
 
 #logging setup
 def setup_logging():
@@ -71,13 +72,13 @@ class AddressProcessor:
         @app.get("address/{postal_code}") and it will return the address information for the given postal code.
         @app get("address/latlong)
     """
-    def __init__(self, api_key: str = "") -> None:
+    def __init__(self) -> None:
         self.logger = logging.getLogger(__name__)
         #slf.logger.level = logging.DEBUG
         self.logger.info("Initializing AddressProcessor")
         
         
-        self.api_key       = "69b891701591a586791541rza1a4f06"
+        self.api_key       = settings.geocoding_api_key
         self._latest:      Optional[Address] = None
 
     def get_addressByPostalCode(self, address: Address) -> Optional[Address]:

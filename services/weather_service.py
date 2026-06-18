@@ -26,6 +26,7 @@ import urllib.parse
 import json
 import logging
 from venv import logger
+from config import settings
 
 #logging setup
 def setup_logging():
@@ -163,14 +164,13 @@ class WeatherProcessor:
 
     def __init__(
         self,
-        api_key:    str        = "",
         temp_unit:  TempUnit   = TempUnit.FAHRENHEIT,
         speed_unit: SpeedUnit  = SpeedUnit.MPH,
         history_limit: int     = 50,
     ) -> None:
         self.logger = logging.getLogger(__name__)
         self.logger.info("Initializing WeatherProcessor")
-        self.api_key       = api_key
+        self.api_key       = settings.open_meteo_api_key
         self.temp_unit     = temp_unit
         self.speed_unit    = speed_unit
         self.history_limit = history_limit
