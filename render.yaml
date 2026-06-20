@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: weather-app
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    plan: free
+    envVars:
+      - key: GEOCODING_API_KEY
+        sync: false
+      - key: OPEN_METEO_API_KEY
+        sync: false

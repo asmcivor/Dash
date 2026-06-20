@@ -13,6 +13,7 @@
 ## Backlog
 - [ ] Weather class allow the user to switch between C & F
 - [ ] Weather class allow to switch between mph and kph
+- [ ] Get the low and high forcast and put into the webpage
 
 ### Features
 - [ ] Add error state UI for failed geocoding lookup
