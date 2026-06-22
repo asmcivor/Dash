@@ -5,6 +5,9 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     plan: free
+    domains:
+    - name: www.alanmcivor.com
+    - name: alanmcivor.com
     envVars:
       - key: GEOCODING_API_KEY
         sync: false
