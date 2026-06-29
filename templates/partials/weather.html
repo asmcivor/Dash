@@ -1,9 +1,29 @@
-<i class="wi {{ icon }} wi-flip-vertical weather-icon" style="font-size: x-large;"></i>
-<p>Temperature: {{ current_weather.temperature }} {{ current_weather.temp_unit }}</p>
-<p>Wind Speed: {{ current_weather.wind_speed }} {{ current_weather.speed_unit }}</p>
+<!-- <p>Temperature: {{ current_weather.temperature }} {{ current_weather.temp_unit }}</p>
+<p>Wind Speed: {{ current_weather.wind_speed }} {{ current_weather.speed_unit }}</p> -->
 <div class="circlecard">
-	<p class="addtemp">36° | 60°</p>
-	<P class="maintemp">{{ current_weather.temperature }}°</p>
-	<p class="addtemp">feels like 36°</p>
-</div> 
+	<p class="addtemp">{{current_weather.forecast[0].low | int}}° | {{current_weather.forecast[0].high | int}}°</p>
+	<i class="wi {{ icon }} wi-flip-vertical weather-icon" style="font-size: 1rem;"></i>
+	<p class="maintemp">{{ current_weather.temperature | int }}°</p>
+	<p class="addtemp">Feels like: {{ current_weather.feelslike | int }}°</p>
+</div>
 
+<h3>Forecast</h3>
+<!--
+<div class="forecastcard">
+	<H4>{{current_weather.forecast[0].fc_date.strftime("%m/%d")}}</H4>
+	<p>High: {{ current_weather.forecast[0].high }}°</p>
+	<p>Low: {{ current_weather.forecast[0].low }}°</p>
+	<i class="wi {{ current_weather.forecast[0].weather_icon }} wi-flip-vertical weather-icon" style="font-size: 1rem;"></i>
+</div>
+-->
+
+<div class="forecast-row">
+  {% for day in current_weather.forecast %}
+  <div class="forecastcard">
+    <h4>{{ day.fc_date.strftime("%m/%d") }}</h4>
+    <p>High: {{ day.high | int }}°</p>
+    <p>Low: {{ day.low | int }}°</p>
+    <i class="wi {{ day.weather_icon }} wi-flip-vertical weather-icon" style="font-size: 1rem;"></i>
+  </div>
+  {% endfor %}
+</div>
