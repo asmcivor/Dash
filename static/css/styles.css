@@ -298,18 +298,19 @@
 /* weather styles */
     .weather-icon {
       font-size: 80px;
+      margin: .25rem;
       color: var(--header-border);
     } 
 
   .addtemp {
 	  font-size: .75rem;
-    margin: .5rem;
+    margin: 0px;
     /* border: 1px solid var(--debug); */
 	  color: var(--ink-muted);
   }
   .maintemp {
     margin: 0px;
-	  font-size: 2.5rem;
+	  font-size: 1.0rem;
     font-weight: bold;
 	  color: var(--header-border);
   }
@@ -319,9 +320,27 @@
       justify-items: center;
       background: var(--primary);
       border: 4px solid var(--header-border);
-      border-radius: 50%;
-      width: 150px;
-	  height: 150px;
+      border-radius: 10%;
+      width: 100px;
+	  height: 100px;
+    }
+    .forecast-row {
+      display: flex;
+      flex: 1;
+      gap: 0.25rem;
+      overflow-x: auto;   /* handles narrow screens gracefully */
+    }
+
+    .forecastcard {
+	    display: grid;
+      align-items: center;
+      justify-items: center;
+      background: var(--primary);
+      border: 2px solid var(--header-border);
+      font-size: 0.75rem;
+      border-radius: 10%;
+      width: 80px;
+	    height: 100px;
     }
 /* ── Form layout: stacked rows, inputs right-aligned ── */
     .form-fields {

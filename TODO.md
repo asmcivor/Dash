@@ -1,19 +1,22 @@
 # Weather App — TODO
 
 ## In Progress
-- [X ] Update code to use updated address and weather service
-- [ ] Have the webpage handle multiple responses from the get adddress call.
-- [X] Fix weather tests.
-- [X] Implement Weather class method to populate key fields
-- [X] Cleaner way to create an address directly from the address response.
-- [X] Figure out where the response from the API should be converted into a data object (list) to be used by the app.  Have the api call convert it or the calling funtion?
-- [ ] Implement `weather_code_to_string` for remaining weather codes (TDD red-green-refactor)
-- [X] The get forecast from api.open-meteo.com is expecting a lat and a long.  But in some cases they are null.  The get Address by postal code is not returning a true Address object but the response from the API call.  Do we convert the response to only get the data we need or modify to pull the data from the response.
+
+- [ ] Forcaset Release
+    [X] Passs the forecast data back to the webpage
+    [X] Update weather service to get the date and time for forecast.
+    [X] remove the timeservice
+    [ ] Implement `weather_code_to_string` for remaining weather codes (TDD red-green-refactor)
+    [X ] Low and high for the day
+    [X ] Icon for the day
+    [X ] Support for 7 day forcast
+    [ ] Add timezone for the user
 
 ## Backlog
 - [ ] Weather class allow the user to switch between C & F
 - [ ] Weather class allow to switch between mph and kph
 - [ ] Get the low and high forcast and put into the webpage
+- [ ] Have the webpage handle multiple responses from the get adddress call.
 
 ### Features
 - [ ] Add error state UI for failed geocoding lookup
@@ -52,6 +55,11 @@
 - [x] Two-column dashboard layout in pure CSS
 - [x] Sticky header with mobile hamburger menu (personal hobby page)
 - [x] `/current-time` HTMX endpoint
-
+- [X ] Update code to use updated address and weather service
+- [X] Fix weather tests.
+- [X] Implement Weather class method to populate key fields
+- [X] Cleaner way to create an address directly from the address response.
+- [X] Figure out where the response from the API should be converted into a data object (list) to be used by the app.  Have the api call convert it or the calling funtion?
+- [X] The get forecast from api.open-meteo.com is expecting a lat and a long.  But in some cases they are null.  The get Address by postal code is not returning a true Address object but the response from the API call.  Do we convert the response to only get the data we need or modify to pull the data from the response.
 ---
 _Update this file at the start or end of each session._

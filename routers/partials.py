@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 from typing import Optional
 from fastapi import APIRouter, Form, Request, Depends, Query, logger
@@ -6,9 +7,9 @@ from fastapi.responses import HTMLResponse
 
 from dependencies import get_templates
 from services.data_service import DataService
-from services.time_service import TimeService
+#from services.time_service import TimeService
 from services.address_service import AddressProcessor, Address
-from services.weather_service import WeatherProcessor, WeatherReading, TempUnit, SpeedUnit
+from services.weather_service import WeatherProcessor, WeatherReading, TempUnit, SpeedUnit, weather_code
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -52,7 +53,7 @@ async def LatLong_partial(
     weather_response = wproc.get_current(weather_address)
     current_weather = WeatherReading.from_api_response(weather_response[0], weather_address)
     # calculat the icon
-    icon = f"wi-day-sunny"
+    icon = WeatherProcessor().getweatherdescription(current_weather.weather_snapshot, weather_code.ICON)
     if current_weather is None:
         logger.error("Failed to retrieve weather information.")
         addressdata = f"{street}, {city}, {state}, {zip_code}, {country}."
@@ -77,12 +78,13 @@ async def current_time_partial(
     Returns the current time fragment.
     """
 
-    service = TimeService()
-    time_data = await service.get_current_time()
+    #service = TimeService()
+    #time_data = await service.get_current_time()
+    time_data = datetime.now()
 
     return templates.TemplateResponse(
         "partials/current_time.html",
-        {"request": request, "time_data": time_data},
+        {"request": request, "time_data": time_data.strftime("%Y-%m-%d")},
     )
 
 #route for the reports page.

@@ -17,7 +17,10 @@ import time
 
 #from fastapi import logger
 #from services.address_service import Address, AddressProcessor # Import the Address class from the address_service module
-from services.address_service import Address, AddressProcessor   
+from services.address_service import Address, AddressProcessor
+#from services.time_service import TimeService   
+from typing import Any
+from datetime import datetime
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
@@ -64,6 +67,22 @@ class weather_code(str,Enum):
     TEXT = "text"
     ICON = "icon"
 
+@dataclass
+class Forecast:  # could be a day or an hour or a week, etc. Default is a single day forecast
+    """A single day's weather forecast."""
+    fc_date:        datetime = field(default_factory=datetime.now)
+    temp:           float = 0.0
+    high:           float = 0.0
+    low:            float = 0.0
+    feelslikelow:       float = 0.0
+    feelslikehigh:      float = 0.0
+    sunrise:        datetime | None = None
+    sunset:         datetime | None = None
+    description:    str   = ""
+    weather_snapshot: int = 0
+    # strings that define the weather for the day, based on the weather_snapshot code
+    weather_text: str = ""
+    weather_icon: str = ""
 
 @dataclass
 class WeatherReading:
@@ -72,33 +91,74 @@ class WeatherReading:
     lat:            float = 0.0
     lon:            float = 0.0
     temperature:    float = 0.0
+    feelslike:      float = 0.0
     wind_speed:     float = 0.0
     temp_unit:      TempUnit  = TempUnit.FAHRENHEIT
     temp_char:      TempChar = TempChar.F
     speed_unit:     SpeedUnit = SpeedUnit.MPH
+    weather_snapshot:   int       = 0
     description:    str       = ""
     humidity:       float | None = None   # percent value is a float with no default value and none is acceptable
     timestamp:      float     = field(default_factory=time.time)
     elevation:      float     = 0.0   # gets the time with every creation of the object
+    forecast:       list[Forecast] = field(default_factory=list)
+    
+    @classmethod
+    def buildforecast(cls, daily : dict) -> list[Forecast]:
+        forecasts = []
+        timedata = daily.get("time", [])
+        codedata = daily.get("weather_code", [])
+        temp_max_data = daily.get("temperature_2m_max", [])
+        temp_min_data = daily.get("temperature_2m_min", [])
+        sunrise_data = daily.get("sunrise", [])
+        sunset_data = daily.get("sunset", [])
+        feelslikemax_data = daily.get("apparent_temperature_max", [])
+        feelslikemin_data = daily.get("apparent_temperature_min", [])
+
+        for i in range(len(timedata)):
+            fc_date = datetime.strptime(timedata[i], "%Y-%m-%d")
+            forecast = Forecast(
+                fc_date=fc_date,
+                high=temp_max_data[i] if i < len(temp_max_data) else 0.0,
+                low=temp_min_data[i] if i < len(temp_min_data) else 0.0,
+                feelslikehigh=feelslikemax_data[i] if i < len(feelslikemax_data) else 0.0,
+                feelslikelow=feelslikemin_data[i] if i < len(feelslikemin_data) else 0.0,
+                sunrise=datetime.strptime(sunrise_data[i], "%Y-%m-%dT%H:%M") if i < len(sunrise_data) else None,
+                sunset=datetime.strptime(sunset_data[i], "%Y-%m-%dT%H:%M") if i < len(sunset_data) else None,
+                weather_snapshot=codedata[i] if i < len(codedata) else 0,
+                weather_text=WeatherProcessor().getweatherdescription(codedata[i], weather_code.TEXT) if i < len(codedata) else "Unknown",
+                weather_icon=WeatherProcessor().getweatherdescription(codedata[i], weather_code.ICON) if i < len(codedata) else "Unknown"
+            )
+            forecasts.append(forecast)
+        return forecasts
     
     @classmethod
     def from_api_response(cls, weather: dict, address: Address) -> WeatherReading:
+        f1: Forecast = Forecast()
         logger.debug("Processing API response: %s", weather)
         weather_units = weather.get("current_units", {})
         weather_current = weather.get("current", {})
+        forecast_data = weather.get("daily", {})
+        if address.house_number and address.street:
+            locdata=f"{address.house_number} {address.street}, {address.city}, {address.state} {address.zip_code}"
+        else:
+            locdata=f"{address.city}, {address.state} {address.zip_code}"
 
         try:
             return cls(
-            location=f"{address.house_number} {address.street}, {address.city}, {address.state} {address.zip_code}, {address.country}",
+            location=locdata,
             temperature=weather_current.get("temperature_2m", 0.0),
             wind_speed=weather_current.get("wind_speed_10m", 0.0),
             # update this section to handle C/F
             temp_unit=TempUnit.FAHRENHEIT.name,
             speed_unit=SpeedUnit.MPH.name,
+            weather_snapshot=weather_current.get("weather_code", 0),
             description=weather.get("description", ""),
-            humidity=weather.get("humidity",""),
+            humidity=weather_current.get("relative_humidity_2m",""),
             lat=weather.get("latitude", 0.0),
             lon=weather.get("longitude", 0.0),
+            feelslike=weather_current.get("apparent_temperature", 0.0),
+            forecast=cls.buildforecast(forecast_data)
             )
         except (ValueError, TypeError) as e:
             logger.error("Error processing API response: %s", e)
@@ -283,7 +343,7 @@ class WeatherProcessor:
     # Private helpers
     # ------------------------------------------------------------------
 
-    def _fetch_from_api(self, location: Address) -> WeatherReading:
+    def _fetch_from_api(self, location: Address, fccount: int = 7) -> WeatherReading:
         """
         Call the weather API and return a WeatherReading.
 
@@ -300,11 +360,12 @@ class WeatherProcessor:
             + urllib.parse.urlencode({
                 "latitude":  location.lat,
                 "longitude": location.lon,
-                "current":   "temperature_2m,wind_speed_10m,relative_humidity_2m,weather_code",
+                "current":   "temperature_2m,wind_speed_10m,relative_humidity_2m,weather_code,apparent_temperature",
+                "daily": "temperature_2m_max,temperature_2m_min,weather_code,sunrise,sunset,apparent_temperature_max,apparent_temperature_min",
                 "temperature_unit": "fahrenheit",
                 "wind_speed_unit":  "mph",
                 "timezone":  "auto",
-                "forecast_days": 1,
+                "forecast_days": fccount,
             })
         )
         with urllib.request.urlopen(wx_url, timeout=10) as resp:
@@ -379,6 +440,7 @@ class WeatherProcessor:
 if __name__ == "__main__":
     setup_logging()
     wproc = WeatherProcessor()
+    print(f"Current weather date: {wproc.fc_date}")
     
 
     

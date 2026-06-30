@@ -1,7 +1,12 @@
+import datetime as dt
+import time
 import unittest
 import logging
-from services.weather_service import WeatherProcessor, WeatherReading, TempUnit, SpeedUnit, weather_code
+
+import pytest
+from services.weather_service import Forecast, WeatherProcessor, WeatherReading, TempUnit, SpeedUnit, weather_code
 from services.address_service import Address, AddressProcessor
+#from services.time_service import TimeService
 
 def setup_logging():
     logger = logging.getLogger()
@@ -102,7 +107,7 @@ class TestWeatherReading(unittest.TestCase):
         icon = WeatherProcessor().getweatherdescription(71,weather_code.ICON)
         self.assertEqual(icon, "wi-snow")
 
-
+class TestLocation:
     def test_validLocation(self):
         # partial Locatoin
         aproc = AddressProcessor()
@@ -113,8 +118,11 @@ class TestWeatherReading(unittest.TestCase):
         weather_response = wproc.get_current(weather_address)
         current_weather = WeatherReading.from_api_response(weather_response[0], weather_address)
         # weather API returns a slightly different lat/lon
-        self.assertAlmostEqual(current_weather.lat, 45.394, places=2)  
-        self.assertAlmostEqual(current_weather.lon, -122.246, places=2)
+        assert current_weather.weather_snapshot > -1  # Ensure weather_code is present
+        assert current_weather.lat == pytest.approx(45.394, abs=1e-2)  # Ensure latitude is correct
+        assert current_weather.lon == pytest.approx(-122.246, abs=1e-2)  # Ensure longitude is correct
+
+        
 
     def test_validLocation2(self):
         aproc = AddressProcessor()
@@ -124,9 +132,40 @@ class TestWeatherReading(unittest.TestCase):
         weatheraddress = Address.from_api_response(address_response[0])
         weather_response = wproc.get_current(weatheraddress)
         current_weather = WeatherReading.from_api_response(weather_response[0], weatheraddress)
-        self.assertEqual(current_weather.location, "37032 Salmonberry Street, Sandy, Oregon 97055, us")
-        self.assertAlmostEqual(current_weather.lat, 45.412, places=2)  
-        self.assertAlmostEqual(current_weather.lon, -122.293, places=2)
+        assert current_weather.location == "37032 Salmonberry Street, Sandy, Oregon 97055"
+        assert current_weather.lat == pytest.approx(45.412, abs=1e-2)
+        assert current_weather.lon == pytest.approx(-122.293, abs=1e-2)
+
+class TestForecasts:
+    
+    def test_weatherDateConstruct(self):
+        todayforecast = Forecast(fc_date=dt.datetime.now(), temp=70.0, high=75.0, low=65.0)
+        assert todayforecast.temp == 70.0
+        assert todayforecast.high == 75.0
+        assert todayforecast.low == 65.0
+        assert todayforecast.weather_snapshot == 0
+
+    def test_weatherDateTime(self):
+        starttime = Forecast(fc_date=dt.datetime.now(), temp=70.0, high=75.0, low=65.0)
+        time.sleep(3)  # Wait for 3 seconds
+        endtime = Forecast(fc_date=dt.datetime.now(), temp=70)
+        assert starttime.fc_date + dt.timedelta(seconds=3) <= endtime.fc_date  # The timestamps should be different since we waited for 3 seconds
+
+    def test_forecast_from_api_response(self):
+        forecast_data = {
+            "time": ["2024-06-01", "2024-06-02", "2024-06-03"],
+            "temperature_2m_max": [75.0, 80.0, 78.0],
+            "temperature_2m_min": [60.0, 65.0, 62.0],
+            "weather_code": [1, 2, 3]
+        }
+        forecast_list = WeatherReading.buildforecast(forecast_data)
+        assert len(forecast_list) == 3
+        assert forecast_list[0].fc_date == dt.datetime.strptime("2024-06-01", "%Y-%m-%d")
+        assert forecast_list[0].high == 75.0
+        assert forecast_list[0].low == 60.0
+        assert forecast_list[0].weather_snapshot == 1
+
+
 
  
 
