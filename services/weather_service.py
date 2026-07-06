@@ -102,6 +102,7 @@ class WeatherReading:
     timestamp:      float     = field(default_factory=time.time)
     elevation:      float     = 0.0   # gets the time with every creation of the object
     forecast:       list[Forecast] = field(default_factory=list)
+    timezone:       str = "UTC"  # default to UTC, can be set to any valid timezone string
     
     @classmethod
     def buildforecast(cls, daily : dict) -> list[Forecast]:
@@ -241,13 +242,13 @@ class WeatherProcessor:
     # Public API — each method is one HTMX endpoint
     # ------------------------------------------------------------------
 
-    def get_current(self, location: Address) -> WeatherReading:
+    def get_current(self, location: Address, timezone: str = "UTC") -> WeatherReading:
         """
         Fetch current weather for *location* and cache it.
 
         HTMX:  hx-get="/weather/current?location={location}"
         """
-        weather_response = self._fetch_from_api(location)
+        weather_response = self._fetch_from_api(location, timezone)
         if weather_response is None:
             return None
         else:
@@ -343,7 +344,7 @@ class WeatherProcessor:
     # Private helpers
     # ------------------------------------------------------------------
 
-    def _fetch_from_api(self, location: Address, fccount: int = 7) -> WeatherReading:
+    def _fetch_from_api(self, location: Address, timezone: str = "UTC", fccount: int = 7) -> WeatherReading:
         """
         Call the weather API and return a WeatherReading.
 
@@ -364,7 +365,7 @@ class WeatherProcessor:
                 "daily": "temperature_2m_max,temperature_2m_min,weather_code,sunrise,sunset,apparent_temperature_max,apparent_temperature_min",
                 "temperature_unit": "fahrenheit",
                 "wind_speed_unit":  "mph",
-                "timezone":  "auto",
+                "timezone":  timezone,
                 "forecast_days": fccount,
             })
         )

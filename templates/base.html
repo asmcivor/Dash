@@ -9,25 +9,16 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     <!--<link rel="stylesheet" href="/static/css/styles.css"> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
     <link href="{{ url_for('static', path='css/styles.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', path='css/weather-icons.min.css') }}" rel="stylesheet">
 </head>
 <body>
     <header class="site-header">
 
-  <!--
-    .header-inner is position:relative — both the mobile dropdown
-    and the desktop centered nav use absolute positioning relative to it.
-
-    Mobile:  [brand ................] [☰]
-             dropdown appears below bar, right-aligned, content-width only
-
-    Desktop: [brand] [nav — centered] [          ]
-             nav absolutely centered via left:50% + translateX(-50%)
-  -->
   <div class="header-inner">
 
-    <!-- Brand: image + title -->
+    <!-- Brand: image + title — clicking goes to dashboard -->
     <a href="/" class="brand" aria-label="Home">
       <div class="brand-avatar">
         <img src="/static/images/mt-hood-small.jpg"
@@ -39,34 +30,34 @@
       </span>
     </a>
 
-    <!-- Nav: absolutely positioned in both mobile & desktop contexts -->
     <nav id="nav-drawer"
          class="nav-drawer"
          aria-label="Main navigation">
       <ul>
         <li>
-          <a href="/current_time"
-             class="{{ 'active' if active_page == 'nav1' else '' }}"
-             hx-get="/current_time"
+          <a href="/weather"
+             class="{{ 'active' if active_page == 'weather' else '' }}"
+             hx-get="/weather"
              hx-target="#main-content"
-             hx-push-url="true">Nav1</a>
+             hx-push-url="true">Weather</a>
         </li>
         <li>
-          <a href="/nav2"
-             class="{{ 'active' if active_page == 'nav2' else '' }}"
-             hx-get="/nav2"
+          <a href="/books"
+             class="{{ 'active' if active_page == 'books' else '' }}"
+             hx-get="/books"
              hx-target="#main-content"
-             hx-push-url="true">Nav2</a>
+             hx-push-url="true">Books</a>
         </li>
         <li>
-          <a href="/nav3"
-             class="{{ 'active' if active_page == 'nav3' else '' }}"
-             hx-get="/nav3"
+          <a href="/travel"
+             class="{{ 'active' if active_page == 'travel' else '' }}"
+             hx-get="/travel"
              hx-target="#main-content"
-             hx-push-url="true">Nav3</a>
+             hx-push-url="true">Travel</a>
         </li>
       </ul>
     </nav>
+
 
     <!-- Hamburger (mobile only — triggers the dropdown) -->
     <button class="nav-toggle"
@@ -88,6 +79,7 @@
   {% block content %}{% endblock %}
 </main>
 <script>
+  document.getElementById("timezone").value = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const toggle = document.getElementById('nav-toggle');
   const drawer = document.getElementById('nav-drawer');
 

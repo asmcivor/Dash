@@ -48,6 +48,9 @@
       font-family: var(--font-display);
       color: var(--ink);
     }
+    ul {
+      list-style-position: inside;
+    }
 
     /* ── Header Shell ──────────────────────────────── */
     /* position:relative so the mobile dropdown can be  */
@@ -270,6 +273,12 @@
       align-items: center;
       gap: .75rem;
     }
+    #search-box.card-header {
+      display: flex;
+	    flex-direction: row;
+      align-items: center;
+      gap: .75rem;
+    }
 
     .card-label {
       font-size: 0.65rem;
@@ -301,6 +310,11 @@
       margin: .25rem;
       color: var(--header-border);
     } 
+button .ti {
+    font-size: 20px;
+    vertical-align: middle;
+    color: var(--ink);
+}
 
   .addtemp {
 	  font-size: .75rem;

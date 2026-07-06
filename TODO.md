@@ -6,10 +6,9 @@
     [X] Passs the forecast data back to the webpage
     [X] Update weather service to get the date and time for forecast.
     [X] remove the timeservice
-    [ ] Implement `weather_code_to_string` for remaining weather codes (TDD red-green-refactor)
-    [X ] Low and high for the day
-    [X ] Icon for the day
-    [X ] Support for 7 day forcast
+    [X] Low and high for the day
+    [X] Icon for the day
+    [X] Support for 7 day forcast
     [ ] Add timezone for the user
 
 ## Backlog
@@ -19,6 +18,7 @@
 - [ ] Have the webpage handle multiple responses from the get adddress call.
 
 ### Features
+- [ ] Add Cookies for weather search
 - [ ] Add error state UI for failed geocoding lookup
 - [ ] Handle edge case: geocoding returns zero results
 - [ ] Style the address selection modal (native `<dialog>`)
@@ -30,6 +30,7 @@
 - [ ] Add docstrings to `address_service.py` public functions
 - [ ] Review router layer for any HTTP logic leaking into service files
 - [ ] Audit logging calls — confirm all modules use `logging.getLogger(__name__)`
+- [ ] fix parse address to handle the case of San Antonio, TX 78205
 
 ### Testing
 - [ ] Expand pytest coverage for geocoding edge cases

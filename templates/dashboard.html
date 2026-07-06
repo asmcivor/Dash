@@ -1,119 +1,82 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="col-full">
-    <secton id="time-container"
-        hx-get="/partials/current_time"
-        hx-trigger="load"
-        hx-swap="innerHTML">
-        <p>Loading time...</p>
-    </secton>
-</div>
-<!--
-  hx-get      → endpoint to call
-  hx-trigger  → when to trigger (load = immediately on page load)
-  hx-target   → where to swap the response HTML
-  hx-swap     → how to swap (innerHTML replaces the inside of the target)
--->
-    <div class="container">
-        <div class="column">  
-            <section id="stats-container"
-                hx-get="/partials/stats"
-                hx-trigger="load"
-                hx-swap="innerHTML">
-                <P>loading Stats...</P>
-            </section>
-        </div>
-        <div class="column">
-             <h2>Time</h2>
-            <secton id="time-container"
-                hx-get="/partials/current_time"
-                hx-trigger="load"
-                hx-swap="innerHTML">
-                <p>Loading time...</p>
-            </secton>
-        </div>
-    </div>
 
-  <div class="container">
+
+ <div class="container">
     <div class="column">
         <div class="card">
-            <div class="card-header">   
+            <div class="card-header" id="search-box">   
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"
                     viewBox="0 0 24 24" aria-hidden="true">
                     <circle cx="12" cy="11" r="3"/>
                     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
                 </svg>
-                <div><h3  class="card-label">Location</h3></div>
-            </div>  
-        </div>
-        <form id="address-form" 
-            hx-post="/partials/getWeatherForAddress"
-            hx-target="#weather-result"
-            hx-swap="innerHTML"
-            hx-indicator="#spinner">
-            <div class ="form-fields">
-                <div class="field">
-                    <label for="street">Street:</label>
-                    <div class="input-wrap">
-                        <input type="text" name="street" id="street" placeholder="37032 Salmonberry St" />
-                    </div>
-                </div>
-                <div class="field">
-                    <label for="city">City:</label>
-                    <div class="input-wrap">
-                        <input type="text" name="city" id="city" placeholder="Sandy">
-                    </div>
-                </div>
-                <div class="field">
-                    <label for="state">State:</label>
-                    <div class="input-wrap">
-                        <input type="text" name="state" id="state" placeholder="OR">
-                    </div>
-                </div>
-                <div class="field">
-                    <label for="zip_code">Zip Code:</label>
-                    <div class="input-wrap">
-                        <input type="text" name="zip_code" id="zip_code" placeholder="97055">
-                    </div>
-                </div>
-                <div class="field">
-                    <label for="country">Country:</label>
-                    <div class="input-wrap">
-                        <input type="text" name="country" id="country" placeholder="US">
-                    </div>
-                </div>
-            </div>
-            <div class="form-actions">
-                <button type="submit" class="btn-submit">Get Weather</button>
-                <span id="spinner" class="htmx-indicator">Loading...</span>
-            </div>
-        </form>
-    </div>
-    <div class="column">
-        <div id="weather-result" class="card">
-            <div class="card-header">   
-                <div  ><h4>Current Weather</h4></div>
-                    <!--<section id="weather-container" 
-                        hx-get="/partials/current_time"
-                        hx-trigger="load"
-                        hx-swap="innerHTML">
-                        <p>Loading time...</p>
-                    </section>-->
-            </div> <!-- Card Header -->
+				<form id="address-form"
+					hx-post="/partials/getWeatherForAddress"
+					hx-target="#weather-result"
+					hx-swap="innerHTML"
+					hx-indicator="#spinner">
+
+					<div class="form-fields">
+						<div class="field city-search-field">
+
+							<label for="city_state">Location:</label>
+
+							<div class="input-wrap">
+								<input type="text"
+									name="city_state"
+									id="city_state"
+									placeholder="Sandy, OR"
+									autocomplete="off" />
+                                <input type="hidden" id="timezone" name="timezone" value="" />
+								<ul class="recent-dropdown" id="recent-dropdown" hidden role="listbox"></ul>
+							</div>
+                            <button type="submit">
+								<i class="ti ti-cloud-search" aria-hidden="true"></i>
+							</button>
+							<span id="spinner" class="htmx-indicator">Loading…</span>
+
+						</div>
+					</div>
+
+				</form>
+            </div>  <!-- Card Header  -->
+            <div class="card-body" id="weather-result">
+                
+            </div> <!-- Card Body -->
         </div> <!-- Card -->
-        <div id="weather-result1"></div>
-    </div> <!-- Column -->
+	</div> <!-- column -->
 </div>
 <div class="container">
     <div class="column">
         <div class="card">
             <div class="card-header">   
-                <div><h3 class="card-label">Data Table</h3></div>
-        
-            </div> 
-        </div>
-    </div>  
-</div>
+                <div><h3 class="card-label">Book Summary Page</h3></div>
+            </div>  <!-- Card Header -->
+            <div class="card-body">
+                <ul>
+                    <li>book 1</li>
+                    <li>book 2</li>
+                    <li>book 3</li>
+                </ul>
+            </div>  <!-- Card Body -->
+        </div> <!-- Card -->
+    </div> <!-- Column -->
+    <div class="column">
+        <div class="card">
+            <div class="card-header">   
+                <div><h3 class="card-label">Travel Summary Page</h3></div>
+            </div>  <!-- Card Header -->
+            <div class="card-body">
+                <ul>
+                    <li>travel 1</li>
+                    <li>travel 2</li>
+                    <li>travel 3</li>
+                </ul>
+            </div> <!-- Card Body -->
+        </div> <!-- Card -->
+    </div> <!-- Column -->  
+</div> <!-- Container -->
 
 {% endblock %}

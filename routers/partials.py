@@ -22,11 +22,8 @@ router = APIRouter(tags=["partials"])
 @router.post("/getWeatherForAddress", response_class=HTMLResponse)
 async def LatLong_partial(
     request: Request,
-    street: Optional[str] = Form(None),
-    city: Optional[str] = Form(None),
-    state: Optional[str] = Form(None),
-    zip_code: Optional[str] = Form(None),
-    country: Optional[str] = Form(None),
+    city_state: Optional[str] = Form(None),
+    timezone: Optional[str] = Form("UTC"),
     templates: Jinja2Templates = Depends(get_templates),
 ):
     """
@@ -36,13 +33,25 @@ async def LatLong_partial(
     """
     First get the address data from the form
     """
-    logger.debug(f"Received form data: street={street}, city={city}, state={state}, zip_code={zip_code}, country={country}")
+    logger.info("RF Processing weather request for address.")
+    logger.debug(f"Received form data: city_state={city_state}, timezone={timezone}")
     aproc = AddressProcessor()
     wproc = WeatherProcessor()
-    addressresponse = aproc.get_addressByPostalCode(Address(street=street, city=city, state=state, zip_code=zip_code, country=country))
+    #addressresponse = aproc.get_addressByPostalCode(Address(street=street, city=city, state=state, zip_code=zip_code, country=country))
+    addressstring = Address.parse_address_s(city_state)
+    logger.debug(f"Parsed address string: {addressstring}")
+    if addressstring is None:
+        logger.error("Failed to parse address information.")
+        addressdata = f"{city_state}."
+        return templates.TemplateResponse(
+            "partials/weatherError.html",   
+            {"request": request, "addressdata": addressdata},
+        )
+    addressresponse = aproc.get_addressByPostalCode(Address(street="", city=addressstring.city, state=addressstring.state, zip_code=addressstring.zip_code, country=""))
     if addressresponse is None: 
         logger.error("Failed to retrieve address information.")
-        addressdata = f"{street}, {city}, {state}, {zip_code}, {country}."
+        addressdata = f"{city_state}."
+
         return templates.TemplateResponse(
             "partials/weatherError.html",   
             {"request": request, "addressdata": addressdata},
@@ -50,13 +59,13 @@ async def LatLong_partial(
 # if data is ok then get the weather for the address
 # At this point assuming only 1 address is returned from the address service, so we take the first one.
     weather_address = Address.from_api_response(addressresponse[0])
-    weather_response = wproc.get_current(weather_address)
+    weather_response = wproc.get_current(weather_address, timezone)
     current_weather = WeatherReading.from_api_response(weather_response[0], weather_address)
     # calculat the icon
     icon = WeatherProcessor().getweatherdescription(current_weather.weather_snapshot, weather_code.ICON)
     if current_weather is None:
         logger.error("Failed to retrieve weather information.")
-        addressdata = f"{street}, {city}, {state}, {zip_code}, {country}."
+        addressdata = f"{city_state}."
         
         return templates.TemplateResponse(
             "partials/weatherError.html",   
@@ -67,6 +76,8 @@ async def LatLong_partial(
         "partials/weather.html",
         {"request": request, "current_weather": current_weather, "icon": icon},
     )
+
+
 #route for the time service
 @router.get("/current_time", response_class=HTMLResponse)
 async def current_time_partial(

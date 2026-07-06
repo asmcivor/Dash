@@ -5,6 +5,7 @@ import time
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
+from unittest import case
 import urllib.request
 import urllib.parse
 from urllib.parse import urlencode, quote
@@ -41,6 +42,35 @@ class Address:
     ISO_state: str | None = None
     lat: float | None = None
     lon: float | None = None
+
+
+    @classmethod
+    def parse_address_s(cls, city_state_zip: str) -> Address:
+     """ assumes a coma seperated city, state, zip string and returns an address object with the city, state, and zip fields populated"""    
+     """ Check the length of the parts list.  if only 1 then check if it's a zip code
+     if only 1 and not a zip code then assume it's a city and return an address with only the city field populated.  If 2 then assume it's city and state, if 3 then assume it's city, state, zip code.  If more than 3 then assume it's city, state, zip code and ignore the rest. 
+     """ 
+     if city_state_zip is None or city_state_zip.strip() == "":
+         return None
+     parts = city_state_zip.split(",")  # assumes city, then state, then zip code, all separated by commas
+     match len(parts):
+        case 1:
+            # check if it's a zip code
+            if parts[0].strip().isdigit() and len(parts[0].strip()) == 5:
+                return Address(zip_code=parts[0].strip())
+            else:
+                return Address(city=parts[0].strip())
+        case 2: 
+            city = parts[0] if len(parts) > 0 else ""
+            state = parts[1] if len(parts) > 1 else ""
+            return Address(city=city.strip(), state=state.strip())
+        case 3:
+            city = parts[0] if len(parts) > 0 else ""
+            state = parts[1] if len(parts) > 1 else ""
+            zip_code = parts[2] if len(parts) > 2 else ""
+            return Address(city=city.strip(), state=state.strip(), zip_code=zip_code.strip())
+        case _:
+            return None
 
     @classmethod
     def from_api_response(cls, raw: dict) -> "Address":

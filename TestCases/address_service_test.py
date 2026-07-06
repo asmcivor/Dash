@@ -84,6 +84,28 @@ class TestAddress(unittest.TestCase):
         ##address = address_processor.get_addressByPostalCode(add)
         ##self.assertIsNone(address)
     
+class TestAddressHelpers:
+    def test_parse_address_s(self):   
+        address_string = "Sandy, OR, 97055"
+        address = Address.parse_address_s(address_string)
+        assert address.city == "Sandy"  
+        assert address.state == "OR"
+        assert address.zip_code == "97055"
+        address_string = ""
+        address = Address.parse_address_s(address_string)
+        assert address.city is None
+        assert address.state is None 
+        assert address.zip_code is None
+        address_string = "Sandy, OR"
+        address = Address.parse_address_s(address_string)
+        assert address.city == "Sandy"  
+        assert address.state == "OR"
+        assert address.zip_code is None
+        address_string = "97055"
+        address = Address.parse_address_s(address_string)
+        assert address.city is None  
+        assert address.state is None
+        assert address.zip_code == "97055"
 
 
 if __name__ == "__main__":
