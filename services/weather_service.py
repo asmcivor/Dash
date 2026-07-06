@@ -369,7 +369,11 @@ class WeatherProcessor:
                 "forecast_days": fccount,
             })
         )
-        with urllib.request.urlopen(wx_url, timeout=10) as resp:
+        request = urllib.request.Request(
+            wx_url,
+            headers={"User-Agent": "personal-dash/1.0 (alanmcivor.com)"}
+        )
+        with urllib.request.urlopen(request, timeout=10) as resp:
             wx_data = json.loads(resp.read())
 
         self.logger.debug("Weather data fetched: %s", wx_data)
