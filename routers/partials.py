@@ -45,7 +45,7 @@ async def LatLong_partial(
         addressdata = f"{city_state}."
         return templates.TemplateResponse(
             "partials/weatherError.html",   
-            {"request": request, "addressdata": addressdata},
+            {"request": request, "error_message": f"Unable to retrieve weather information for the provided address: {city_state}."},
         )
     addressresponse = aproc.get_addressByPostalCode(Address(street="", city=addressstring.city, state=addressstring.state, zip_code=addressstring.zip_code, country=""))
     if addressresponse is None: 
@@ -54,12 +54,21 @@ async def LatLong_partial(
 
         return templates.TemplateResponse(
             "partials/weatherError.html",   
-            {"request": request, "addressdata": addressdata},
+            {"request": request, "error_message": f"Unable to retrieve weather information for the provided address: {city_state}."},
         )
 # if data is ok then get the weather for the address
 # At this point assuming only 1 address is returned from the address service, so we take the first one.
     weather_address = Address.from_api_response(addressresponse[0])
-    weather_response = wproc.get_current(weather_address, timezone)
+    try:
+        logger.debug(f"Fetching weather for address: {weather_address}, timezone: {timezone}")
+        weather_response = wproc.get_current(weather_address, timezone) 
+    except RuntimeError as e:
+        logger.error("Failed to retrieve weather information.")
+        addressdata = f"{city_state}."
+        return templates.TemplateResponse(
+            "partials/weatherError.html",   
+            {"request": request, "error_message": str(e)},
+        )
     current_weather = WeatherReading.from_api_response(weather_response[0], weather_address)
     # calculat the icon
     icon = WeatherProcessor().getweatherdescription(current_weather.weather_snapshot, weather_code.ICON)
@@ -69,7 +78,7 @@ async def LatLong_partial(
         
         return templates.TemplateResponse(
             "partials/weatherError.html",   
-            {"request": request, "addressdata": addressdata, "icon": icon},
+            {"request": request, "error_message": f"Unable to retrieve weather information for the provided address: {city_state}."},
         )
     
     return templates.TemplateResponse(

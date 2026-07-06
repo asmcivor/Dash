@@ -373,9 +373,15 @@ class WeatherProcessor:
             wx_url,
             headers={"User-Agent": "personal-dash/1.0 (alanmcivor.com)"}
         )
-        with urllib.request.urlopen(request, timeout=10) as resp:
-            wx_data = json.loads(resp.read())
-
+        try:
+            with urllib.request.urlopen(request, timeout=10) as resp:
+                wx_data = json.loads(resp.read())
+        except urllib.error.HTTPError as e:
+            if e.code == 429:
+                self.logger.warning("Open-Meteo rate limit hit (429)")
+                raise RuntimeError("Weather service is temporarily unavailable. Please try again in a moment.")
+            raise
+        
         self.logger.debug("Weather data fetched: %s", wx_data)
         if wx_data == None:
             return None
