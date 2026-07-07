@@ -230,7 +230,7 @@ class WeatherProcessor:
         history_limit: int     = 50,
     ) -> None:
         self.logger = logging.getLogger(__name__)
-        self.logger.info("Initializing WeatherProcessor")
+        self.logger.debug("Initializing WeatherProcessor")
         self.api_key       = settings.open_meteo_api_key
         self.temp_unit     = temp_unit
         self.speed_unit    = speed_unit
@@ -353,7 +353,8 @@ class WeatherProcessor:
         The stub below calls Open-Meteo's free geocoding + forecast API
         — no key required, good for development.
         """
-        
+        MAX_RETRIES = 3
+        RETRY_DELAY = 2 
 
         # --- 2. Fetch current conditions from the locatoin lat long in the address block--------
         wx_url = (
@@ -373,20 +374,31 @@ class WeatherProcessor:
             wx_url,
             headers={"User-Agent": "personal-dash/1.0 (alanmcivor.com)"}
         )
-        try:
-            with urllib.request.urlopen(request, timeout=10) as resp:
-                wx_data = json.loads(resp.read())
-        except urllib.error.HTTPError as e:
-            if e.code == 429:
-                self.logger.warning("Open-Meteo rate limit hit (429)")
-                raise RuntimeError("Weather service is temporarily unavailable. Please try again in a moment.")
-            raise
-        
-        self.logger.debug("Weather data fetched: %s", wx_data)
-        if wx_data == None:
-            return None
-        else:
-            return wx_data
+        last_error = None
+        for attempt in range(1, MAX_RETRIES + 1):
+            try:
+                with urllib.request.urlopen(request, timeout=10) as resp:
+                    wx_data = json.loads(resp.read())
+                self.logger.debug("Weather data fetched: %s", wx_data)
+                return wx_data
+            except urllib.error.HTTPError as e:
+                if e.code == 429:
+                    self.logger.warning(
+                        "Open-Meteo rate limit hit (attempt %d/%d), retrying in %ds...",
+                        attempt, MAX_RETRIES, RETRY_DELAY
+                    )
+                    self.logger.warning(
+                        "Open-Meteo rate limit hit (attempt %d/%d), retrying in %ds...",
+                        attempt, MAX_RETRIES, RETRY_DELAY
+                    )
+                    last_error = e
+                if attempt < MAX_RETRIES:
+                    time.sleep(RETRY_DELAY)
+            else:
+                raise  # non-429 errors fail immediately
+
+        self.logger.error("Open-Meteo rate limit hit on all %d attempts, giving up.", MAX_RETRIES)
+        raise RuntimeError("Weather service is temporarily unavailable (429). Please try again in a moment.")
 
     def _add_to_history(self, reading: WeatherReading) -> None:
         self._history.append(reading)
