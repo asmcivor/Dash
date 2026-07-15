@@ -1,4 +1,7 @@
+from typing import Optional
+
 from fastapi import APIRouter, Request, Depends
+from fastapi import Cookie
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 
@@ -39,11 +42,13 @@ async def travel_detail(
 async def dashboard(
     request: Request,
     templates: Jinja2Templates = Depends(get_templates),
+    last_weather_location: Optional[str] = Cookie(default="Tualatin, OR")
 ):
     """Main dashboard page — renders the full HTML shell."""
+    
     return templates.TemplateResponse(
         "dashboard.html",
-        {"request": request, "title": "Dashboard"},
+        {"request": request, "title": "Dashboard", "last_weather_location": last_weather_location},
     )
 
 

@@ -112,6 +112,107 @@
       toggle.focus();
     }
   });
+  // 
+  (function () {
+    const COOKIE_KEY = "recent_city_searches";
+
+    // --- Cookie helper ---
+    function getCookieList(key) {
+        const match = document.cookie.split("; ").find(r => r.startsWith(key + "="));
+        if (!match) return [];
+        try {
+            return JSON.parse(decodeURIComponent(match.split("=").slice(1).join("=")));
+        } catch {
+            return [];
+        }
+    }
+
+    // --- Dropdown logic ---
+    const input = document.getElementById("city_state");
+    const dropdown = document.getElementById("recent-dropdown");
+
+    if (!input || !dropdown) return;
+
+    let activeIndex = -1;
+
+    function showDropdown(items) {
+        dropdown.innerHTML = "";
+        activeIndex = -1;
+
+        if (items.length === 0) {
+            dropdown.hidden = true;
+            return;
+        }
+
+        items.forEach((city, i) => {
+            const li = document.createElement("li");
+            li.textContent = city;
+            li.setAttribute("role", "option");
+            li.setAttribute("id", `recent-option-${i}`);
+            li.addEventListener("mousedown", (e) => {
+                e.preventDefault(); // prevent blur firing before click
+                selectCity(city);
+            });
+            dropdown.appendChild(li);
+        });
+
+        dropdown.hidden = false;
+    }
+
+    function hideDropdown() {
+        dropdown.hidden = true;
+        activeIndex = -1;
+    }
+
+    function selectCity(city) {
+        input.value = city;
+        hideDropdown();
+        document.getElementById("address-form").dispatchEvent(new Event("submit", { bubbles: true }));
+    }
+
+    function updateActive() {
+        [...dropdown.querySelectorAll("li")].forEach((li, i) => {
+            li.setAttribute("aria-selected", i === activeIndex);
+        });
+    }
+
+    // Show all recents on focus
+    input.addEventListener("focus", () => {
+        showDropdown(getCookieList(COOKIE_KEY));
+    });
+
+    // Filter as user types
+    input.addEventListener("input", () => {
+        const query = input.value.trim().toLowerCase();
+        const recents = getCookieList(COOKIE_KEY);
+        const filtered = query
+            ? recents.filter(c => c.toLowerCase().includes(query))
+            : recents;
+        showDropdown(filtered);
+    });
+
+    // Keyboard navigation
+    input.addEventListener("keydown", (e) => {
+        const items = [...dropdown.querySelectorAll("li")];
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            activeIndex = Math.min(activeIndex + 1, items.length - 1);
+            updateActive();
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            activeIndex = Math.max(activeIndex - 1, 0);
+            updateActive();
+        } else if (e.key === "Enter" && activeIndex >= 0) {
+            e.preventDefault();
+            selectCity(items[activeIndex].textContent);
+        } else if (e.key === "Escape") {
+            hideDropdown();
+        }
+    });
+
+    // Hide on blur
+    input.addEventListener("blur", hideDropdown);
+})();
 </script>
 </body>
 </html>

@@ -6,7 +6,11 @@
  <div class="container">
     <div class="column">
         <div class="card">
-            <div class="card-header" id="search-box">   
+            <div class="card-header" id="search-box"
+                hx-get="/partials/weather-load?city_state={{last_weather_location}}"
+                hx-trigger="load"
+                hx-target="#weather-result"
+                hx-swap="innerHTML">
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"
                     viewBox="0 0 24 24" aria-hidden="true">
                     <circle cx="12" cy="11" r="3"/>
@@ -16,8 +20,8 @@
 					hx-post="/partials/getWeatherForAddress"
 					hx-target="#weather-result"
 					hx-swap="innerHTML"
+                    hx-include="[name=city_state]"
 					hx-indicator="#spinner">
-
 					<div class="form-fields">
 						<div class="field city-search-field">
 
@@ -27,7 +31,7 @@
 								<input type="text"
 									name="city_state"
 									id="city_state"
-									placeholder="Sandy, OR"
+									placeholder="{{last_weather_location}}"
 									autocomplete="off" />
                                 <input type="hidden" id="timezone" name="timezone" value="" />
 								<ul class="recent-dropdown" id="recent-dropdown" hidden role="listbox"></ul>

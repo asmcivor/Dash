@@ -19,7 +19,7 @@ async def lifespan(app: FastAPI):
 
 def setup_logging():
     logger = logging.getLogger()
-    logger.setLevel(logging.INFO) 
+    logger.setLevel(logging.DEBUG) 
     formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(formatter)
