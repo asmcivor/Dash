@@ -39,6 +39,13 @@ def build_updated_searches(current: list[str], new_entry: str) -> list[str]:
     updated.insert(0, trimmed)
     return updated[:MAX_RECENT]
 
+@router.get("/flashcards-content")
+async def flashcards_content(
+    request: Request, templates: Jinja2Templates = Depends(get_templates)):
+    return templates.TemplateResponse("partials/flashcards-content.html", 
+        {"request": request}
+    )
+
 #load the weather from a cookie on load
 @router.get("/weather-load", response_class=HTMLResponse)
 async def weather_load(

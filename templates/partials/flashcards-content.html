@@ -1,0 +1,36 @@
+<header class="page-head">
+  <p class="eyebrow">Choose your operation</p>
+  <nav class="op-menu" aria-label="Operation select">
+    <button class="op-btn is-active" type="button" aria-label="Addition">+</button>
+    <button class="op-btn" type="button" aria-label="Subtraction">&minus;</button>
+    <button class="op-btn" type="button" aria-label="Multiplication">&times;</button>
+    <button class="op-btn" type="button" aria-label="Division">&divide;</button>
+  </nav>
+</header>
+
+<section class="card" aria-label="Flashcard problem">
+  <div class="pin" aria-hidden="true"></div>
+
+  <div class="problem">
+    <div class="operand">7</div>
+    <div class="operand-row">
+      <span class="operator" aria-hidden="true">+</span>
+      <span class="operand">4</span>
+    </div>
+    <div class="rule"></div>
+
+    <form class="answer-row">
+      <label class="sr-only" for="answer">Your answer</label>
+      <input
+        id="answer"
+        class="answer-input"
+        type="number"
+        inputmode="numeric"
+        placeholder="?"
+        autocomplete="off"
+      >
+    </form>
+  </div>
+</section>
+
+<p class="hint">Type your answer and press Enter</p>

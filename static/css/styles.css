@@ -17,6 +17,7 @@
 */
 
 /* ── Design Tokens — Earth Tones ───────────────── */
+/*
     :root {
     --primary:       #fdf0e8;
     --ink:           #2e1a20;
@@ -51,6 +52,9 @@
     ul {
       list-style-position: inside;
     }
+*/
+@import "variables-base.css";
+@import "flashcard.css";
 
     /* ── Header Shell ──────────────────────────────── */
     /* position:relative so the mobile dropdown can be  */

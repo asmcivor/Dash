@@ -1,0 +1,35 @@
+/* ── Design Tokens — Earth Tones ───────────────── */
+    :root {
+    --primary:       #fdf0e8;
+    --ink:           #2e1a20;
+    --ink-muted:     #4b4748;
+    --secondary:     #e8c8c0;
+    --header-bg:     #7a3a4a;
+    --header-border: #a05060;
+    --boarder:        #d39c69;
+    --accent:        #e8856a;
+    --debug: red;
+    --gap: .5rem;
+    --label-w: 120px;
+    --input-max: 320px;
+    --radius:       8px;
+    --nav-h:         100px;
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body:    'DM Sans', sans-serif;
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--primary);
+      color: var(--ink);
+      font-family: var(--font-body);
+    }
+    h1 h2 h3 h4 h5 h6 {
+      font-family: var(--font-display);
+      color: var(--ink);
+    }
+    ul {
+      list-style-position: inside;
+    }

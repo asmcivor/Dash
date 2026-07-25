@@ -35,7 +35,12 @@ async def travel_detail(
         "active_page": "travel",
     })
 
-
+@router.get("/flashcards")
+async def flashcards_detail(
+    request: Request, templates: Jinja2Templates = Depends(get_templates)):
+    return templates.TemplateResponse("pages/flashcards.html", 
+        { "request": request, "title": "Flashcards","active_page": "flashcards",}
+    )
 
 
 @router.get("/", response_class=HTMLResponse)
