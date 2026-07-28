@@ -1,0 +1,27 @@
+Use Case: Options
+* Actor: Player
+* Goal: Setup the options for the game
+* Preconditions: User is on the flashcard page
+* Trigger: Click the options menu
+* Main flow:
+1 Player Presses menu button
+	System displays the options menu.  The options are
+	1. Operand default +,-,*,/,Random
+	2. Range of values low value default is 0, high value default is 20.  Confirm that the low value is less than the high value.  Give an error if it is not.
+	3. Timer On/Off.  If on is selected allow the user to pick a time.  Default is 5 seconds
+	4. Game count – How many flashcards are included in a game.
+	All options are stored as a cookie
+
+* Postconditions: 
+Cookies are updated with the new values.
+* Alternate/edge flows:
+1 Low value exceeds high
+	Pop up an error that shows the problem.  On Ok go back to the low high form.
+2 Timer exceeds 30 seconds
+	If a timer exceeds thirty seconds then pop a warning.
+3 Timer exceeds 90 seconds
+	Pop an error that the timer cannot exceed 90 seconds.
+
+
+
+
