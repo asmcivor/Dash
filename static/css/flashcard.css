@@ -1,5 +1,12 @@
 * { box-sizing: border-box; }
 
+.flashcard-game {
+  display: flex;
+  flex-direction: column; /* Stacks sub-divs vertically */
+  align-items: center;    /* Centers sub-divs horizontally */
+  justify-content: center; /* Centers sub-divs vertically (optional) */
+}
+
 .flashbody {
   margin: 0;
   min-height: 100vh;
@@ -44,16 +51,18 @@
 }
 /* Operations Menu */
 .op-menu {
+  width: 100%;
+  max-width: 540px;
   display: flex;
-  gap: 8px;
+  gap: 4px;
 }
 
 .op-btn {
   width: 48px;
   height: 48px;
   border-radius: 10px;
-  border: 1px solid var(--rule);
-  background: var(--card);
+  border: 1px solid var(--ink);
+  background: var(--paper);
   color: var(--ink);
   font-family: 'Spectral', serif;
   font-size: 1.25rem;
@@ -79,13 +88,20 @@
 
 .flashcard {
   position: relative;
-  width: 100%;
   background: var(--card);
-  border: 1px solid var(--rule);
-  border-radius: 4px;
+  border: 1px solid var(--ink);
   box-shadow: 0 10px 24px rgba(46, 42, 34, 0.10);
   transform: rotate(-0.6deg);
-  padding: 40px 36px 32px;
+  background: var(--primary);
+  border-radius: var(--radius);
+  padding: .5rem .35rem;
+  width: 100%;
+  max-width: 540px;
+  margin: .25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: border-color 0.2s;
 }
 
 .pin {

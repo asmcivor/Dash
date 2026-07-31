@@ -6,8 +6,10 @@
     --secondary:     #e8c8c0;
     --header-bg:     #7a3a4a;
     --header-border: #a05060;
-    --boarder:        #d39c69;
+    --border:        #d39c69;
     --accent:        #e8856a;
+    --correct-answer: #a0cfa0;
+    --wrong-answer:   #e8856a;
     --debug: red;
     --gap: .5rem;
     --label-w: 120px;
@@ -26,7 +28,7 @@
       color: var(--ink);
       font-family: var(--font-body);
     }
-    h1 h2 h3 h4 h5 h6 {
+    h1, h2, h3, h4, h5, h6 {
       font-family: var(--font-display);
       color: var(--ink);
     }

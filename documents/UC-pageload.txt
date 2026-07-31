@@ -1,0 +1,22 @@
+Use Case: pageload
+•	Actor: Student
+•	Goal: Display the initial screen when the page is loaded
+•	Preconditions: None
+•	Trigger: Page is opened from the primary menu
+•	Main flow:
+1. Click on link to game
+    System displays the page. 
+    1.1. the page has an options menu
+    1.2. A HTML Section flashcard than contains:
+        1.2.1. a Form area for the problem. The form has a border which is initially the ink color (--ink).  initially form doesn't have any values.
+        1.2.2. Text field for the answer to be entered with a submit button tied to the text field.  The answer can be submitted by pressing return in the text form or clicking the submit button
+        1.2.3. an area that dispalys a list of operands.  The current operand is the primary color (--primary) and the other values are secondary (--secondary).  
+        The values are +,-,*,/,Random.  The value selected initially is based on the cookie for operand.
+        1.2.4. Go/Next Button.  Initially the value is Go. 
+        1.2.5. Button that allows the user to pause the timer. It can have 2 values start and pause.  The the timer option is not enabled then the button doesn't show.
+    1.3. New Game button
+    1.4. Timer display A Text display to show the timer.  It is only displayed if the timer option is enabled
+
+•	Postconditions: 
+1. Focus is on the Go Button
+•	Alternate/edge flows: 

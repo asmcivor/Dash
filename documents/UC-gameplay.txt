@@ -5,11 +5,25 @@ Use Case: Game Play
 * Trigger: Accesses website/flashcard
 * Main flow: Numbered steps, actor action ? system response, alternating
 
-1 Student Presses New GameScreen Refreshes.  If timer options in enabled then the users must click starts and then the system Displays 2 numbers with the default operation of last operation used. If the timer option is not enabled the system starts with the display of the problem
-2 Student Enters or Updates Answer – press return or check buttonReviews the answer and if correct turns the border to green if wrong then red.  If correct add to number correct for this session, if wrong add to the number wrong for this session. Display the running count of total problems, number of correct and wrong answers. If the timer expires before the answer is entered then the border turns red and the user can’t enter the answer.3 Presses new problemScreen Refreshes.  Displays 2 numbers with the default operation of last operation used. If timer option then timer resets to default
-
+0. Initial page load (see UC-pageload.txt)
+1. Student Presses New Game and then presses go button
+    1.1 Screen Refreshes.  
+        1.1.1 If timer options in enabled then when Student clicks go then the timer starts and then the system Displays 2 numbers with the default operation of last operation used. If the timer option is not enabled the system starts with the display of the problem
+        1.1.2 If the timer option is not enabled then the system Displays 2 numbers with the default operation of last operation used.
+2 Student Enters or Updates Answer press return or check button
+    2.1 System Reviews the answer and if correct turns the border to green (--correct-answer) if wrong then lighter red (--wrong-answer)  
+    If correct add to number correct for this session, if wrong add to the number wrong for this session. Display the running count of total problems, number of correct and wrong answers. If the timer expires before the answer is entered then the border turns red and the user canï¿½t enter the answer.
+3 Presses Next
+    3.1 Screen Refreshes.  Displays 2 numbers with the default operation of last operation used. If timer option then timer resets to default
+
+
 * Postconditions: Actor leaves the page.
 * Alternate/edge flows: What happens on wrong answers, invalid input, edge cases (division by zero, negative results, etc.)
-1 User Clicks new operandScreen Refreshes.  Displays 2 numbers with the new operand.  Current game counts don’t change. Operands include +,-,*,/,Random2 Enters or Updates Answer – press return or check buttonReviews the answer and if correct turns the border to green if wrong then red.  If correct add to number correct for this session, if wrong add to the number wrong for this session. Display the running count total problems number of correct and wrong answers.3 Presses new problemScreen Refreshes.  Displays 2 numbers with the default operation of last operation used.
-
+1 User Clicks new operand
+    Screen Refreshes.  Displays 2 numbers with the new operand.  Current game counts don't change. Operands include +,-,*,/,Random
+2 Enters or Updates Answer press return or check button
+    Reviews the answer and if correct turns the border to green (--correct-answer) if wrong then light red (--wrong-answer).  If correct add to number correct for this session, if wrong add to the number wrong for this session. Display the running count total problems number of correct and wrong answers.
+
+
+
 
