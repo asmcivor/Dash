@@ -1,0 +1,33 @@
+Use Case: UC-newproblem.txt
+* Actor: System
+* Goal: create a problem that can be returned to the screen
+* Preconditions: Game has been established
+* Trigger: User clicks new problem
+* Main flow: 
+1. Error checks the values based into the function
+2. Calls new problem with the operand, range max.  
+    2.1 creates class
+    2.2 Generates random 1st problem between between 0 and max value.  Update problem class.
+    2.3 Generates random  if operand is "+" then generate 2nd number between 0 and max.  If operand is "-" then generated Random number between 1st number and max.  If operand is "*" then
+    generate a second number between 0 and max value. If the operand is "/" then generate a value between 1 and the first number. update problem class
+    2.4 Calculate the answer, update the problem class
+    2.5 Generate the return to the screen.
+    
+* Postconditions: What's true when it's done successfully
+* Alternate/edge flows: What happens on wrong answers, invalid input, edge cases (division by zero, negative results, etc.)
+* Future consideration
+1. allow for decimal on division
+* Technical
+Class Game
+user string
+max_problems integer
+correct_answers integer
+wrong_anwers integer
+problem count integer 1..max problems
+problem_set problem list  
+
+Class problem
+number1 integer
+number2 integer
+operand OPERAND ENUM
+answer integer

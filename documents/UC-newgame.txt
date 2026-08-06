@@ -1,0 +1,29 @@
+Use Case: New Game
+* Actor: System
+* Goal: Setup a new game structure
+* Preconditions: At anypoint flashcard page is displayed
+* Trigger: User clicks new game
+* Main flow:
+1. checks for existing cookies
+2. Create game object with values from cookies or from default
+3. Returns game object
+* Postconditions: What's true when it's done successfully
+* Alternate/edge flows: What happens on wrong answers, invalid input, edge cases (division by zero, negative results, etc.)
+* Technical
+
+Class Game
+user string  default is no user
+max_problems integer Set to the cookie card_count
+correct_answers integer
+wrong_anwers integer
+problem count integer 1..max problems
+problem_set problem list  
+
+DEFAULT_FLASHCARD_SETTINGS = {
+    "operand": "+",
+    "lowval": 1,
+    "highval": 20,
+    "timer": False,
+    "timerval": 30,
+    "maxcards": 20,
+}

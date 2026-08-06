@@ -1,0 +1,8 @@
+Use Case: [Name]
+•	Actor: Who's doing this (e.g. "Player")
+•	Goal: One sentence — what they're trying to accomplish
+•	Preconditions: What must be true before this starts
+•	Trigger: The action that kicks it off
+•	Main flow: Numbered steps, actor action → system response, alternating
+•	Postconditions: What's true when it's done successfully
+•	Alternate/edge flows: What happens on wrong answers, invalid input, edge cases (division by zero, negative results, etc.)

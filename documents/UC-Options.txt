@@ -6,11 +6,12 @@ Use Case: Options
 * Main flow:
 1 Player Presses menu button
 	System displays the options menu.  The options are
-	1. Operand default system displays a list of values +,-,*,/,Random and the user selects 1.
+	1. Operand default system displays a list of values +,-,*,/,Random and the user selects 1. Cookie variable is operand
 	2. value range.  Display a form with two text inputs.  One for low value default is 0, one for high value default is 20.  Confirm that the low value is less than the high value.
-	display an error if it is not.
-	3. Timer On/Off.  If on is selected then display a text form to allow the user to pick a time.  Default is 5 seconds
-	4. Game count Display a text field to allow entry for how many flashcards are included in a game.
+	display an error if it is not. Cookies are low_val, high_val
+	3. Timer On/Off.  If on is selected then display a text form to allow the user to pick a time.  Default is 5 seconds.  Cookie is timer and timer_val
+	4. Game count Display a text field to allow entry for how many flashcards are included in a game. cookie is card_count
+	5. Stats on/off Allows the user to turn off stats. Cookie is stats (yes/no)
 	All options are stored as a cookie
 
 * Postconditions: 
