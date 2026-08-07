@@ -17,6 +17,8 @@ Use Case: Game Play
     If the timer expires before the answer is entered then the border turns red and the user can�t enter the answer.
 3 Presses Next
     3.1 Screen Refreshes.  Displays 2 numbers with the default operation of last operation used. If timer option then timer resets to default
+4. User clicks End game
+    4.1 System displays the stats for the game just completed.
 
 
 * Postconditions: Actor leaves the page.
@@ -24,7 +26,10 @@ Use Case: Game Play
 1 User Clicks new operand
     Screen Refreshes.  Displays 2 numbers with the new operand.  Current game counts don't change. Operands include +,-,*,/,Random
 2 Enters or Updates Answer press return or check button
-    Reviews the answer and if correct turns the border to green (--correct-answer) if wrong then light red (--wrong-answer).  If correct add to number correct for this session, if wrong add to the number wrong for this session. Display the running count total problems number of correct and wrong answers.
+    Reviews the answer and if correct turns the border to green (--correct-answer) if wrong then light red (--wrong-answer).  
+    If correct add to number correct for this session, if wrong add to the number wrong for this session. Display the running count total problems
+    number of correct and wrong answers.
+3. User hits page refresh during the game.  The current problem is displayed.
 
 
 

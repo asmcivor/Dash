@@ -417,7 +417,8 @@ class WeatherProcessor:
 # ---------------------------------------------------------------------------
 # Utility: WMO weather-code → description
 # ---------------------------------------------------------------------------
-    def getweatherdescription(self, code: int, weather_type: str) -> str:
+    @staticmethod
+    def getweatherdescription(code: int, weather_type: str) -> str:
         _WeatherMAP = {
         0: {"text": "Clear sky", "icon": "wi-day-sunny"},
         1: {"text": "Mainly clear", "icon": "wi-day-cloudy"},
@@ -440,7 +441,8 @@ class WeatherProcessor:
         }
         return _WeatherMAP.get(code, {"text": f"Unknown code {code}", "icon": f"Unknown code {code}"}).get(weather_type)
 
-    def _weather_code_to_text(self, code: int) -> str:
+    @staticmethod
+    def _weather_code_to_text(code: int) -> str:
     # create a dictionary that maps the weather codes to their correspond text and icon
     # descriptions
         _MAP = {

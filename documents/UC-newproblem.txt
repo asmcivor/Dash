@@ -18,13 +18,7 @@ Use Case: UC-newproblem.txt
 * Future consideration
 1. allow for decimal on division
 * Technical
-Class Game
-user string
-max_problems integer
-correct_answers integer
-wrong_anwers integer
-problem count integer 1..max problems
-problem_set problem list  
+
 
 Class problem
 number1 integer

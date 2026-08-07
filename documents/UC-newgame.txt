@@ -7,6 +7,7 @@ Use Case: New Game
 1. checks for existing cookies
 2. Create game object with values from cookies or from default
 3. Returns game object
+4. Continues with UC-pageload.txt
 * Postconditions: What's true when it's done successfully
 * Alternate/edge flows: What happens on wrong answers, invalid input, edge cases (division by zero, negative results, etc.)
 * Technical
