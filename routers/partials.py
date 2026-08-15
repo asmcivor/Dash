@@ -5,13 +5,16 @@ import urllib.parse
 from typing import Optional
 from fastapi import APIRouter, Form, Request, Depends, Query, logger
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, Response
 
 from dependencies import get_templates
 from services.data_service import DataService
 #from services.time_service import TimeService
 from services.address_service import AddressProcessor, Address
+from services.flashcard_service import Game, GameProcessor, Operand
 from services.weather_service import WeatherProcessor, WeatherReading, TempUnit, SpeedUnit, weather_code
+from constants import COOKIE_RECENT_SEARCHES, MAX_RECENT_SEARCHES, COOKIE_FLASHCARD_GAME_SESSION, COOKIE_FLASHCARD_OPTIONS
+from services.cookie_helper import *
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -22,12 +25,22 @@ router = APIRouter(tags=["partials"])
 # HTMX swaps these fragments into the DOM without a full page reload.
 # route for the address service
 
-# The cookie contains the last 10 searched locations
-COOKIE_NAME = "recent_city_searches"
-MAX_RECENT  = 10
+def build_game_from_cookies(request: Request) -> Game:
+    gamesession = get_json_cookie(request, COOKIE_FLASHCARD_GAME_SESSION, DEFAULT_FLASHCARD_GAME_SESSION)
+    if gamesession["running"] is False:
+        options = get_json_cookie(request, COOKIE_FLASHCARD_OPTIONS, DEFAULT_FLASHCARD_OPTIONS)
+        return Game(
+            low_value=options["low_value"],
+            high_value=options["high_value"],
+            operand=Operand(options["operand"]),
+            timer=options["timer"],
+            stats=options["stats"],
+        )
+    else:
+        return Game.from_dict(gamesession)
 
 def get_recent_searches(request: Request) -> list[str]:
-    raw = request.cookies.get(COOKIE_NAME, "[]")
+    raw = request.cookies.get(COOKIE_RECENT_SEARCHES, "[]")
     try:
         return json.loads(urllib.parse.unquote(raw))
     except Exception:
@@ -37,14 +50,82 @@ def build_updated_searches(current: list[str], new_entry: str) -> list[str]:
     trimmed = new_entry.strip()
     updated = [s for s in current if s.lower() != trimmed.lower()]
     updated.insert(0, trimmed)
-    return updated[:MAX_RECENT]
+    return updated[:MAX_RECENT_SEARCHES]
 
+#flashcard interface
 @router.get("/flashcards-content")
 async def flashcards_content(
     request: Request, templates: Jinja2Templates = Depends(get_templates)):
     return templates.TemplateResponse("partials/flashcards-content.html", 
         {"request": request}
     )
+# Route for the new flashcard interface
+@router.get("/flashcards-content-new")
+async def flashcards_content_new(
+    request: Request, templates: Jinja2Templates = Depends(get_templates)):
+
+    gamesession = get_json_cookie(request, COOKIE_FLASHCARD_GAME_SESSION, DEFAULT_FLASHCARD_GAME_SESSION)
+
+    if gamesession["running"] is False:
+        options = get_json_cookie(request, COOKIE_FLASHCARD_OPTIONS, DEFAULT_FLASHCARD_OPTIONS)
+        game = Game(
+            low_value=options["low_value"],
+            high_value=options["high_value"],
+            operand=Operand(options["operand"]),
+            timer=options["timer"],
+            stats=options["stats"],
+        )
+    else:
+        game = Game.from_dict(gamesession)
+
+    gameproc = GameProcessor(game)
+    
+    response = templates.TemplateResponse(
+        "partials/flashcards-content-new.html",
+        {"request": request, "game": game},
+    )
+    gamesession = game.to_dict()
+    gamesession["running"] = True
+    set_json_cookie(response, COOKIE_FLASHCARD_GAME_SESSION, gamesession)
+    return response
+
+@router.post("/flashcards-next")
+async def flashcards_next(
+    request: Request, templates: Jinja2Templates = Depends(get_templates)
+):
+    # This route handles the "Next" action for the flashcard game, returning the updated flashcard content.
+    # check if a game is running and if so get the current game state from the cookie, otherwise initialize a new game
+    game = build_game_from_cookies(request)
+
+
+    # advance the game to the next problem
+    gameproc = GameProcessor(game)
+    game.add_problem(gameproc.get_problem_values(game.operand))
+
+    response = templates.TemplateResponse("partials/flashcards-content-new.html", {"request": request, "game": game})
+    gamesession = game.to_dict()
+    gamesession["running"] = True
+    set_json_cookie(response, COOKIE_FLASHCARD_GAME_SESSION, gamesession)
+    return response
+
+@router.post("/flashcards-answer")
+async def flashcards_answer(
+    request: Request, templates: Jinja2Templates = Depends(get_templates)
+):
+    # This route handles the "Answer" action for the flashcard game, returning the updated flashcard content.
+    game = build_game_from_cookies(request)
+    form = await request.form()
+    answer = int(form.get("answer", 0))
+    current_problem = game.problems[game.current_problem_index] if game.problem_count > 0 else None
+    if current_problem:
+        correct = game.check_problem(answer, current_problem)
+    
+
+    response = templates.TemplateResponse("partials/flashcards-content-new.html", {"request": request, "game": game,"correct": correct if current_problem else None})
+    gamesession = game.to_dict()
+    gamesession["running"] = True
+    set_json_cookie(response, COOKIE_FLASHCARD_GAME_SESSION, gamesession)
+    return response 
 
 #load the weather from a cookie on load
 @router.get("/weather-load", response_class=HTMLResponse)
@@ -78,7 +159,7 @@ async def get_weather_for_address(
 
     response = await _get_weather_response(request, city_state, timezone, templates)
     response.set_cookie(
-        key      = COOKIE_NAME,
+        key      = COOKIE_RECENT_SEARCHES,
         value    = urllib.parse.quote(json.dumps(updated)),
         max_age  = 60 * 60 * 24 * 365,  # 1 year
         httponly = False,   # False so JS can read it for the dropdown

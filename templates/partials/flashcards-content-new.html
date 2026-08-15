@@ -1,0 +1,162 @@
+<!--
+  partials/flashcards-content.html
+  Rendered by GET /partials/flashcards-content (hx-trigger="load" from pages/flashcards.html,
+  and on refresh since the parent page re-fires the same load trigger).
+
+  Expected context variables (route should supply these — checking the game cookie
+  to decide "resume" vs "fresh game"):
+    game.problems[i].operand   - "+" | "-" | "*" | "/" | "+-" | "*/" | "R" (from options cookie, default "+")
+    game.problems[i].number1   - int
+    game.problems[i].number2   - int
+    game.timer   - bool (from options cookie)
+    game.correct_count   - int
+    game.wrong_count     - int
+    game.max_problems    - int
+    game.current_problem_index   - int
+    game.problem_count   - int
+    game.problems   - list[Problem]
+    game.timerval   - int
+    game.stats   - bool (from options cookie)
+    
+-->
+
+<div class="flashcard-game">
+
+  <!-- 1.1 Options menu (see UC-Options) -->
+  <div class="options-bar">
+    <button type="button"
+            class="options-btn"
+            hx-get="/partials/flashcards-options"
+            hx-target="#flashcard-game"
+            hx-swap="innerHTML">
+      <i class="ti ti-settings" aria-hidden="true"></i>
+      Options
+    </button>
+  </div>
+
+  <!-- 1.4 Timer displays — only shown if timer option is enabled -->
+  {% if game.timer %}
+  <div class="timer-displays">
+    <div class="timer-display">
+      <span class="timer-label">Game</span>
+      <span id="game-timer" class="timer-value">{{ game_seconds }}</span>
+    </div>
+    <div class="timer-display">
+      <span class="timer-label">Problem</span>
+      <span id="problem-timer" class="timer-value">{{ problem_seconds }}</span>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- 1.2.3 Operand list — current operand in --primary, others in --secondary -->
+  <ul class="operand-list" aria-label="Operation select">
+    {% for op in ["+", "-", "*", "/", "+-", "*/", "R"] %}
+    <li class="operand-item {{ 'is-current' if op == game.operand else '' }}"
+        hx-get="/partials/flashcards-select-operand?operand={{ op }}"
+        hx-target="#flashcard-game"
+        hx-swap="innerHTML">
+      {{ op }}
+    </li>
+    {% endfor %}
+  </ul>
+
+  <!-- 1.2 Flashcard form area -->
+   {% set current = game.problems[game.current_problem_index] if game.problem_count > 0 else None %}
+  <form id="answer-form"
+        class="flashcard"
+        hx-post="/partials/flashcards-answer"
+        hx-target="#flashcard-game"
+        hx-include="#answer"
+        hx-swap="innerHTML">
+
+    <div class="problem{%- if current is none or current.checked is false -%}
+    {%- elif current.checked == true and current.correct_answer == true -%} -correct
+    {%- elif current.checked == true and current.correct_answer == false -%} -wrong
+    {%- endif -%}">
+      
+      <div class="operand">{{ current.number1 if current else "" }}</div> <!---->
+      <div class="operand-row">
+        <span class="operator" aria-hidden="true">{{ current.operand.value if current and current.operand != "R" else "" }}</span>
+        <span class="operand">{{ current.number2 if current else "" }}</span>
+      </div> <!-- second operand and operator-->
+      <div class="rule"></div> <!-- rule line -->
+
+      <div class="answer-row"> <!-- answer input area -->
+        <!--<label class="sr-only" for="answer">Your answer</label>  -->
+        <!-- 1.2.2 Submits on Enter (native form behavior) or via the submit button -->
+        <input
+          id="answer"
+          name="answer"
+          class="answer-input{%- if current is none or current.checked is false -%}
+    {%- elif current.checked == true and current.correct_answer == true -%} -correct
+    {%- elif current.checked == true and current.correct_answer == false -%} -wrong
+    {%- endif -%}"
+          type="number"
+          inputmode="numeric"
+          value="{{ current.user_answer if current and current.checked else '' }}"
+          placeholder="?"
+          aria-label="Submit answer"
+          autocomplete="off">
+       
+      </div>
+    </div> <!-- problem area --> 
+     
+  </form> <!-- flashcard form -->
+
+  <!-- 1.2.4 / 1.2.5 Go/Next and Pause Timer controls -->
+  <div class="game-controls">
+    <button type="submit" class="answer-submit-btn" aria-label="Submit answer">
+          <i class="ti ti-check" aria-hidden="true"></i>
+    </button> <!-- submit answer button -->
+    <button id="go-next-btn"
+            type="button"
+            class="go-next-btn"
+            autofocus
+            hx-post="/partials/flashcards-next"
+            hx-target="#flashcard-game"
+            hx-swap="innerHTML">
+      {{ "Start" if not current else "Next" }}
+    </button>
+
+    {% if game.timer %}
+    <button id="pause-timer-btn"
+            type="button"
+            class="pause-timer-btn"
+            data-state="{{ 'running' if timer_running else 'paused' }}">
+      {{ "Pause" if timer_running else "Start" }}
+    </button>
+    {% endif %}
+  </div>
+
+  <!-- 1.3 New Game — clears score keeping and timers -->
+  <button type="button"
+          class="new-game-btn"
+          hx-post="/partials/flashcards-newgame"
+          hx-target="#flashcard-game"
+          hx-swap="innerHTML">
+    New Game
+  </button>
+
+  <!-- 1.5 Stats section — only shown if Stats are turned on in options -->
+  {% if game.stats %}
+  <div class="stats-section">
+    <div class="stat">
+      <span class="stat-label">Correct</span>
+      <span id="stat-correct" class="stat-value">{{ game.correct_count }}</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Wrong</span>
+      <span id="stat-wrong" class="stat-value">{{ game.wrong_count }}</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Total</span>
+      <span id="stat-total" class="stat-value">{{ game.correct_count + game.wrong_count }}</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Total</span>
+      <span id="game-number" class="stat-value"> out of {{ game.max_problems }}</span>
+    </div>
+  </div>
+  {% endif %}
+
+</div>

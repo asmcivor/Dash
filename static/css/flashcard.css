@@ -116,11 +116,26 @@
   box-shadow: 0 2px 3px rgba(0,0,0,0.25);
 }
 
-.problem {
+.problem,
+.problem-correct,
+.problem-wrong {
   display: flex;
+  border-color: var(--ink);
+  border-width: 1px;
+  border-style: solid;
   flex-direction: column;
   align-items: flex-end;
   font-family: 'Spectral', serif;
+}
+
+.problem-correct {
+  border-color: var(--correct-answer);
+  border-width: 3px;
+}
+
+.problem-wrong {  
+  border-color: var(--wrong-answer);
+  border-width: 3px;
 }
 
 .operand {
@@ -156,17 +171,27 @@
   justify-content: flex-end;
 }
 
-.answer-input {
+.answer-input,
+.answer-input-correct,
+.answer-input-wrong {
   width: 108px;
-  font-family: 'Spectral', serif;
-  font-size: 1.6rem;
+  font-size: 2.6rem;
   font-weight: 600;
+  line-height: 1.1;
+  font-family: 'Spectral', serif;
   text-align: right;
-  color: var(--moss-dk);
   background: transparent;
   border: none;
   border-bottom: 2px solid var(--rule);
-  padding: 2px 4px 6px;
+  /*padding: 2px 4px 6px; */
+}
+.answer-input-correct {
+  color: var(--correct-answer);
+  border-bottom-color: var(--correct-answer);
+}
+.answer-input-wrong {
+  color: var(--wrong-answer);
+  border-bottom-color: var(--wrong-answer);
 }
 
 .answer-input::placeholder {
@@ -187,12 +212,19 @@
 
 /* remove number input spinners for a cleaner worksheet look */
 .answer-input::-webkit-outer-spin-button,
-.answer-input::-webkit-inner-spin-button {
+.answer-input::-webkit-inner-spin-button,
+.answer-input-correct::-webkit-outer-spin-button,
+.answer-input-correct::-webkit-inner-spin-button,
+.answer-input-wrong::-webkit-outer-spin-button,
+.answer-input-wrong::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-.answer-input[type=number] {
-  -moz-appearance: textfield;
+
+.answer-input[type=number],
+.answer-input-correct[type=number],
+.answer-input-wrong[type=number] {
+  -moz-appearance: textfield;  /* instead of textfield */
   appearance: textfield;
 }
 

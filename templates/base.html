@@ -62,6 +62,13 @@
             hx-target="#main-content"
             hx-push-url="/flashcards">Flashcards</a>
       </li>
+      <li>
+        <a href="/flashcards-new"
+            class="{{ 'active' if active_page == 'flashcards-new' else '' }}"
+            hx-get="/partials/flashcards-content-new"
+            hx-target="#main-content"
+            hx-push-url="/flashcards-new">Flashcards-New</a>
+      </li>
       </ul>
     </nav>
 

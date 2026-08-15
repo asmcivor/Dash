@@ -93,9 +93,10 @@ class TestAddressHelpers:
         assert address.zip_code == "97055"
         address_string = ""
         address = Address.parse_address_s(address_string)
-        assert address.city is None
-        assert address.state is None 
-        assert address.zip_code is None
+        assert address is None
+        # assert address.city is None
+        # assert address.state is None 
+        # assert address.zip_code is None
         address_string = "Sandy, OR"
         address = Address.parse_address_s(address_string)
         assert address.city == "Sandy"  
