@@ -91,7 +91,7 @@
   background: var(--card);
   border: 1px solid var(--ink);
   box-shadow: 0 10px 24px rgba(46, 42, 34, 0.10);
-  transform: rotate(-0.6deg);
+  transform: rotate(-0.0deg);
   background: var(--primary);
   border-radius: var(--radius);
   padding: .5rem .35rem;

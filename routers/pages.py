@@ -37,19 +37,13 @@ async def travel_detail(
 
 # Flashcard section
 
-@router.get("/flashcards")
-async def flashcards_detail(
-    request: Request, templates: Jinja2Templates = Depends(get_templates)):
-    return templates.TemplateResponse("pages/flashcards.html", 
-        { "request": request, "title": "Flashcards","active_page": "flashcards",}
-    )
 # New flashcard interface
-@router.get("/flashcards-new")
+@router.get("/flashcards")
 async def flashcards_new_detail(
     request: Request, 
     templates: Jinja2Templates = Depends(get_templates)):
-    return templates.TemplateResponse("pages/flashcards-new.html", 
-        { "request": request, "title": "Flashcards New","active_page": "flashcards-new",}
+    return templates.TemplateResponse("pages/flashcards.html", 
+        { "request": request, "title": "Flashcards New","active_page": "flashcards",}
     )
 
 @router.get("/", response_class=HTMLResponse)
