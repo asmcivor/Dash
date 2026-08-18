@@ -25,8 +25,7 @@ router = APIRouter(tags=["partials"])
 # HTMX swaps these fragments into the DOM without a full page reload.
 # route for the address service
 
-#TEMP GLOBAL NUMBER NEXT PROBLEM COUNT
-NEXTCOUNT: int = 0
+
 def build_game_from_cookies(request: Request) -> Game:
     gamesession = get_json_cookie(request, COOKIE_FLASHCARD_GAME_SESSION, DEFAULT_FLASHCARD_GAME_SESSION)
     logger.debug(f"Game session from cookies: {gamesession}")
@@ -96,9 +95,7 @@ async def flashcards_next(
     # This route handles the "Next" action for the flashcard game, returning the updated flashcard content.
     # check if a game is running and if so get the current game state from the cookie, otherwise initialize a new game
     game = build_game_from_cookies(request)
-    global NEXTCOUNT
-    NEXTCOUNT += 1
-    logger.debug(f"In Next: NEXTCOUNT={NEXTCOUNT}")
+
 
 
     # advance the game to the next problem

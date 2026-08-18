@@ -25,8 +25,6 @@
       
       <!-- 1.2 Flashcard form area -->
       {% set current = game.problems[game.current_problem_index] if game.problem_count > 0 else None %}
-      <p> problem checked is {{ current.checked }} </p>
-      <p> game problem count {{game.problem_count}} index {{game.current_problem_index}} </p>
       <form id="answer-form"
             class="flashcard"
             hx-post="/partials/flashcards-answer"
@@ -129,7 +127,6 @@
               hx-post="/partials/flashcards-newgame"
               hx-target="#flashcard-game"
               hx-swap="innerHTML">New Game</button>
-      <p>Stats section is it inside a column?</p>
       <!-- 1.5 Stats section — only shown if Stats are turned on in options -->
       {% if game.stats %}
         <div class="stats-section">
@@ -146,8 +143,8 @@
             <span id="stat-total" class="stat-value">{{ game.correct_count + game.wrong_count }}</span>
           </div>
           <div class="stat">
-            <span class="stat-label">Total</span>
-            <span id="game-number" class="stat-value">out of {{ game.max_problems }}</span>
+            <span class="stat-label">Progress</span>
+            <span id="game-number" class="stat-value">{{game.current_count}} out of {{ game.max_problems }}</span>
           </div>
         </div>
       {% endif %}
