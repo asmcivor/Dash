@@ -168,7 +168,10 @@ class TestGameToDict:
         correct_answer = problem.correct_answer
         game.add_problem(problem)
         result = game.to_dict()
-        assert result["problems"] == [{"number1": num1, "number2": num2, "answer": answer, "correct_answer": correct_answer, "checked": False, "operand": Operand.ADD.value}]
+        assert result["problem_count"] == 1
+        assert result["problems"][0]["operand"] == Operand.ADD.value
+        assert result["problems"][0]["user_answer"] == 0
+        assert result["problems"] == [{"number1": num1, "number2": num2, "answer": answer, "correct_answer": correct_answer, "checked": False,"user_answer": 0, "operand": Operand.ADD.value}]
         # add two more problems and verify  
         problem2 = gameproc.get_problem_values(Operand.SUBTRACT)
         num1_2 = problem2.number1
@@ -184,9 +187,9 @@ class TestGameToDict:
         game.add_problem(problem3)
         result = game.to_dict()
         assert result["problems"] == [
-            {"number1": num1, "number2": num2, "answer": answer, "correct_answer": correct_answer, "checked": False, "operand": Operand.ADD.value},
-            {"number1": num1_2, "number2": num2_2, "answer": answer2, "correct_answer": correct_answer2, "checked": False, "operand": Operand.SUBTRACT.value},
-            {"number1": num1_3, "number2": num2_3, "answer": answer3, "correct_answer": correct_answer3, "checked": False, "operand": Operand.MULTIPLY.value},
+            {"number1": num1, "number2": num2, "answer": answer, "correct_answer": correct_answer, "user_answer": 0, "checked": False, "operand": Operand.ADD.value},
+            {"number1": num1_2, "number2": num2_2, "answer": answer2, "correct_answer": correct_answer2, "user_answer": 0, "checked": False, "operand": Operand.SUBTRACT.value},
+            {"number1": num1_3, "number2": num2_3, "answer": answer3, "correct_answer": correct_answer3, "user_answer": 0, "checked": False, "operand": Operand.MULTIPLY.value},
         ]
 
     def test_to_dict_with_no_problems(self):
