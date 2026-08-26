@@ -4,7 +4,7 @@ import logging
 from fastapi.templating import Jinja2Templates
 from contextlib import asynccontextmanager
 
-from routers import dev, pages, partials
+from routers import dev, pages, partials, partialsflash
 from config import settings
 
 
@@ -40,6 +40,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # Include routers
 app.include_router(pages.router)
 app.include_router(partials.router, prefix="/partials")
+app.include_router(partialsflash.router, prefix="/partials")
 app.include_router(dev.routerdev, prefix="/dev")
 
 

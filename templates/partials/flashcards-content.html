@@ -24,7 +24,10 @@
     <div class="column game-column">
       
       <!-- 1.2 Flashcard form area -->
-      {% set current = game.problems[game.current_problem_index] if game.problem_count > 0 else None %}
+      {% set current = game.problem if game.problem_count > 0 else None %}
+       <!-- <p>Current Set to {{ current }} false/true/empty</p>
+       <p> user answer {{current.user_answer if current else "no answer"}}</p>
+      <p> checked answer > {{current.correct_answer if current else "NOTCHECKED"}}</p> -->
       <form id="answer-form"
             class="flashcard"
             hx-post="/partials/flashcards-answer"
@@ -50,9 +53,9 @@
                    class="answer-input{%- if current is none or not current.checked -%} {%- elif current.checked and current.correct_answer -%} -correct {%- elif current.checked and not current.correct_answer -%} -wrong {%- endif -%}"
                    type="number"
                    inputmode="numeric"
-                   value="{{ current.user_answer if current and current.checked }}"
+                   value="{{ current.user_answer if current and current.checked else '' }}"
                    placeholder="?"
-                   {% if current is none or not current.checked %}autofocus{% endif %}
+                   {% if current and not current.checked %}autofocus{% endif %}
                    aria-label="Submit answer"
                    autocomplete="off">
           </div> 
@@ -62,7 +65,7 @@
       <!-- flashcard form -->
       <!-- 1.2.4 / 1.2.5 Go/Next and Pause Timer controls -->
       <div class="game-controls">
-        <button type="submit" class="answer-submit-btn" aria-label="Submit answer">
+        <button type="submit" form="answer-form" class="answer-submit-btn" aria-label="Submit answer">
           <i class="ti ti-check" aria-hidden="true"></i>
         </button>
         <!-- submit answer button -->
@@ -103,16 +106,6 @@
         </div>
         <!-- problem timer display -->
       {% endif %}
-      <!-- 1.2.3 Operand list — current operand in --primary, others in --secondary -->
-      <ul class="operand-list" aria-label="Operation select">
-        {% for op in ["+", "-", "*", "/", "+-", "*/", "R"] %}
-          <li class="operand-item {{ 'is-current' if op == game.operand else '' }}"
-              hx-get="/partials/flashcards-select-operand?operand={{ op }}"
-              hx-target="#flashcard-game"
-              hx-swap="innerHTML">{{ op }}</li>
-        {% endfor %}
-      </ul>
-      <!-- operand list -->
       {% if game.timer %}
         <button id="pause-timer-btn"
                 type="button"
@@ -144,7 +137,7 @@
           </div>
           <div class="stat">
             <span class="stat-label">Progress</span>
-            <span id="game-number" class="stat-value">{{game.current_count}} out of {{ game.max_problems }}</span>
+            <span id="game-number" class="stat-value">{{game.correct_count + game.wrong_count}} out of {{ game.max_problems }}</span>
           </div>
         </div>
       {% endif %}

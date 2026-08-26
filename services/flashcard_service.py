@@ -40,6 +40,8 @@ class Operand(str, Enum):
     SUBTRACT = "-"
     MULTIPLY = "*"
     DIVIDE = "/"
+    PLUSMINUS = "+-"
+    MULTDIV = "*/"
     RANDOM = "R"
 
 # Cookies definitions
@@ -62,7 +64,44 @@ DEFAULT_FLASHCARD_GAME_SESSION = {
 #OPTION_COOKIE_NAME = "flashcard_options"
 #GAME_SESSION_COOKIE_NAME = "flashcard_game_session"
 
+@dataclass
+class Options:
+    operand: Operand = Operand.ADD
+    low_value: int = 0
+    high_value: int = 20
+    max_problems: int = 20
+    timer: bool = False
+    timerval: int = 20
+    stats: bool = False
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "Options":
+        return cls(
+            operand=data["operand"],
+            low_value=data["low_value"],
+            high_value=data["high_value"],
+            max_problems=data["max_problems"],
+            timer=data["timer"],
+            timerval=data["timerval"],
+            stats=data["stats"]
+        )
+
+    def to_dict(self) -> dict:
+        return {
+            "operand": self.operand,
+            "low_value": self.low_value,
+            "high_value": self.high_value,
+            "max_problems": self.max_problems,
+            "timer": self.timer,
+            "timerval": self.timerval,
+            "stats": self.stats
+        }
+
+@dataclass
+class OptionError:
+    low_high: str = ""  # Error message for low/high value validation   
+    timer_warning: str = ""  # Warning message for timer value
+    timer_error: str = ""  # Error message for timer value
 
 @dataclass
 class Game:
@@ -81,7 +120,7 @@ class Game:
     problem_count: int = 0
     running: bool = False
     current_problem_index: int = 0
-    problems: list[Problem] = field(default_factory=list)
+    problem: Problem = field(default=None)
     
     @classmethod
     def from_dict(cls, data: dict) -> "Game":
@@ -101,7 +140,7 @@ class Game:
             wrong_count=data["wrong_count"],
             problem_count=data["problem_count"],
             current_problem_index=data["current_problem_index"],
-            problems=[Problem.from_dict(p) for p in data["problems"]],
+            problem=Problem.from_dict(data["problem"] if data["problem"] else None),
         )
         return game
 
@@ -122,13 +161,18 @@ class Game:
             "wrong_count": self.wrong_count,
             "problem_count": self.problem_count,
             "current_problem_index": self.current_problem_index,
-            "problems": [p.to_dict() for p in self.problems], 
+            "problem": self.problem.to_dict() if self.problem else None,
         }
     
     def add_problem(self, problem: Problem) -> None:
-        self.problems.append(problem)
+        """
+        Adds a problem to the game.  For now we are just tracking the current problem.  Long term when we can persist the game state, we will save all problems.
+        """
+        #self.problems.append(problem) long term
+        self.problem=problem
         self.problem_count += 1
-        self.current_problem_index = self.problem_count - 1
+        # index for now is always 0
+        self.current_problem_index = 0  # index for now is always 0
 
     def check_problem(self, answer: int, problem: Problem) -> bool:
         correct = False
@@ -166,6 +210,8 @@ class Problem:
 
     @classmethod
     def from_dict(cls, data: dict) -> "Problem":
+        if not data:
+            return None
         return cls(
             number1=data["number1"],
             number2=data["number2"],
@@ -189,16 +235,26 @@ class GameProcessor:
 ##        self.logger = logging.getLogger()
 ##        self.logger.debug(f"ProblemProcessor initialized for problem: {self.problem}")
 ##        self.logger.debug(f"ProblemProcessor initialization complete.")
+    def _get_valid_number(self, known_number, operand: Operand) -> int:
+        if operand == Operand.SUBTRACT:
+            return random.randint(self.game.low_value, known_number)
+        elif operand == Operand.DIVIDE:
+            second_number = random.randint(self.game.low_value, known_number)
+            while known_number % second_number != 0:
+                second_number = random.randint(self.game.low_value, known_number)
+                second_number = second_number if second_number != 0 else 1
+            return second_number
+        else:
+            return random.randint(self.game.low_value, self.game.high_value)
 
-
-    def get_problem_values(self,operand : Operand) -> Problem:
+    def get_problem_values(self, operand: Operand) -> Problem:
         if operand == Operand.ADD:
             number1 = random.randint(self.game.low_value, self.game.high_value)
             number2 = random.randint(self.game.low_value, self.game.high_value)
             return Problem(number1=number1, number2=number2, answer=number1 + number2, operand=Operand.ADD)
         elif operand == Operand.SUBTRACT:
             number1 = random.randint(self.game.low_value, self.game.high_value)
-            number2 = random.randint(self.game.low_value, number1)
+            number2 = self._get_valid_number(number1, Operand.SUBTRACT)
             return Problem(number1=number1, number2=number2, answer=number1 - number2, operand=Operand.SUBTRACT)
         elif operand == Operand.MULTIPLY:
             number1 = random.randint(self.game.low_value, self.game.high_value)
@@ -207,14 +263,42 @@ class GameProcessor:
         elif operand == Operand.DIVIDE:
             number2 = random.randint(self.game.low_value, self.game.high_value)
             number2 = number2 if number2 != 0 else 1
-            number1 = random.randint(number2, self.game.high_value)
-            while number1 % number2 != 0:
-                number1 = random.randint(number2, self.game.high_value)
+            number1 = self._get_valid_number(number2,Operand.DIVIDE)
             return Problem(number1=number1, number2=number2, answer=number1 // number2, operand=Operand.DIVIDE)
+        elif operand == Operand.PLUSMINUS:
+            number1 = random.randint(self.game.low_value, self.game.high_value)
+            number2 = random.randint(self.game.low_value, self.game.high_value)
+            # randomly generate a plus or a minus by generating a random number 1 or 2.  IF a 1 then Operand.ADD, else Operand.SUBTRACT
+            if random.randint(1, 2) == 1:
+                return Problem(number1=number1, number2=number2, answer=number1 + number2, operand=Operand.ADD)
+            else:
+                number2 = self._get_valid_number(number1, Operand.SUBTRACT)
+                return Problem(number1=number1, number2=number2, answer=number1 - number2, operand=Operand.SUBTRACT)
+        elif operand == Operand.MULTDIV:
+            number1 = random.randint(self.game.low_value, self.game.high_value)
+            number2 = random.randint(self.game.low_value, self.game.high_value)
+            if random.randint(1, 2) == 1:
+                return Problem(number1=number1, number2=number2, answer=number1 * number2, operand=Operand.MULTIPLY)
+            else:
+                number2 = random.randint(self.game.low_value, self.game.high_value)
+                number1 = self._get_valid_number(number2, Operand.DIVIDE)
+                return Problem(number1=number1, number2=number2, answer=number1 // number2, operand=Operand.DIVIDE)
         else:  # Random case
             number1 = random.randint(self.game.low_value, self.game.high_value)
             number2 = random.randint(self.game.low_value, self.game.high_value)
-            return Problem(number1=number1, number2=number2, answer=number1 + number2, operand=operand)
+            if random.randint(1, 4) == 1:
+                return Problem(number1=number1, number2=number2, answer=number1 + number2, operand=Operand.ADD)
+            elif random.randint(1, 4) == 2:
+                number2 = self._get_valid_number(number1, Operand.SUBTRACT)
+                return Problem(number1=number1, number2=number2, answer=number1 - number2, operand=Operand.SUBTRACT)
+            elif random.randint(1, 4) == 3:
+                return Problem(number1=number1, number2=number2, answer=number1 * number2, operand=Operand.MULTIPLY)
+            else:
+                number2 = random.randint(self.game.low_value, self.game)
+                number2 = number2 if number2 != 0 else 1
+                number1 = self._get_valid_number(number2, Operand.DIVIDE) 
+                return Problem(number1=number1, number2=number2, answer=number1 // number2, operand=Operand.DIVIDE)
+        return None
 
 
 

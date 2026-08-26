@@ -4,18 +4,29 @@ Use Case: Options
 * Preconditions: User is on the flashcard page
 * Trigger: Click the options menu
 * Main flow:
-1 Player Presses menu button
-	System displays the options menu.  The options are
-	1. Operand default system displays a list of values +,-,*,/,Random and the user selects 1. Cookie variable is operand
-	2. value range.  Display a form with two text inputs.  One for low value default is 0, one for high value default is 20.  Confirm that the low value is less than the high value.
+1 Player Presses gear icon button. System displays the options form.  The options are
+	1. Operand system displays a list of values as horizontal radio buttons +,-,*,/,+/-,*/÷, Random and the user selects 1. Cookie variable is operand
+	2. CardRrange.  Display a form with two text inputs.  One for low value default is 0, one for high value default is 20.  Confirm that the low value is less than the high value.
 	display an error if it is not. Cookies are low_val, high_val
-	3. Timer On/Off.  If on is selected then display a text form to allow the user to pick a time.  Default is 5 seconds.  Cookie is timer and timer_val
-	4. Game count Display a text field to allow entry for how many flashcards are included in a game. cookie is card_count
+	3. Timer On/Off as a checkbox with a text field for the value.  If on is selected then display a text form to allow the user to pick a time.  Default is 5 seconds.
+	if the checkbox is no then then the field doesn't allow input.  Cookie is timer and timerval
+	4. Game count Display a text field to allow entry for how many flashcards are included in a game. cookie is max_problems
 	5. Stats on/off Allows the user to turn off stats. Cookie is stats (yes/no)
 	All options are stored as a cookie
+	6. Cancel and Save buttons.  If user clicks Cancel then the form is removed from the screen.  If the user clicks save then the form is passed to the backend (flashcards-options)
 
+Cookie definitions
+DEFAULT_FLASHCARD_OPTIONS = {
+    "operand": "+",
+    "low_value": 0,
+    "high_value": 20,
+    "max_problems": 20,
+    "timer": False,
+    "timerval": 20,
+    "stats": True
+}
 * Postconditions: 
-Cookies are updated with the new values.
+The option cookie COOKIE_FLASHCARD_OPTIONS is updated with the new values.
 * Alternate/edge flows:
 1 Low value exceeds high
 	Pop up an error that shows the problem.  On Ok go back to the low high form.

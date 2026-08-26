@@ -1,0 +1,115 @@
+<!--
+  partials/flashcards-options.html
+  Rendered by:
+    GET  /partials/flashcards-options          -> initial display (gear icon click)
+    POST /partials/flashcards-options          -> re-rendered with `errors` on validation failure
+
+  Both requests use hx-target="#flashcard-game", so this form fully replaces
+  the game view (matches the existing "options-btn" swap already wired in
+  flashcards-content.html).
+
+  Expected context variables:
+    options        - dict/object with: operand, low_value, high_value,
+                     max_problems, timer, timerval, stats
+                     (defaults to DEFAULT_FLASHCARD_OPTIONS if no cookie yet)
+    errors         - dict, keys may include "low_high", "timer_warning",
+                     "timer_error" (values are message strings; {} = no errors)
+-->
+
+<div id="flashcard-game" class="flashcard-game">
+  <div class="container">
+    <div class="column options-column">
+
+      <div class="options-header">
+        <i class="ti ti-settings" aria-hidden="true"></i>
+        <h3 class="card-label">Game Options</h3>
+      </div>
+
+      <form id="options-form"
+            class="options-form"
+            hx-post="/partials/flashcards-options"
+            hx-target="#flashcard-game"
+            hx-swap="outerHTML">
+
+        <!-- 1. Operand -->
+        <fieldset class="option-group">
+          <legend>Operand</legend>
+          <div class="operand-pills">
+            {% for value, label in [("+", "+"), ("-", "-"), ("*", "×"), ("/", "÷"),
+                                     ("+-", "+/-"), ("*/", "×/÷"), ("R", "Random")] %}
+            <label class="operand-pill">
+              <input type="radio" name="operand" value="{{ value }}"
+                     {{ "checked" if options.operand == value else "" }}>
+              <span>{{ label }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </fieldset>
+
+        <!-- 2. Card range -->
+        <fieldset class="option-group">
+          <legend>Card range</legend>
+          <div class="range-fields">
+            <label for="low_value">Low</label>
+            <input type="number" id="low_value" name="low_value" value="{{ options.low_value }}">
+            <label for="high_value">High</label>
+            <input type="number" id="high_value" name="high_value" value="{{ options.high_value }}">
+          </div>
+          {% if errors.low_high %}
+          <p class="option-error" role="alert">{{ errors.low_high }}</p>
+          {% endif %}
+        </fieldset>
+
+        <!-- 3. Timer -->
+        <fieldset class="option-group timer-group">
+          <legend>Timer</legend>
+          <label class="timer-toggle">
+            <input type="checkbox" id="timer" name="timer" value="yes"
+                   {{ "checked" if options.timer else "" }}>
+            <span class="toggle-track" aria-hidden="true"></span>
+            On
+          </label>
+          <div class="timer-value-field">
+            <label for="timerval">Seconds</label>
+            <input type="number" id="timerval" name="timerval" value="{{ options.timerval }}" min="1" max="90">
+          </div>
+          {% if errors.timer_error %}
+          <p class="option-error" role="alert">{{ errors.timer_error }}</p>
+          {% elif errors.timer_warning %}
+          <p class="option-warning" role="alert">{{ errors.timer_warning }}</p>
+          {% endif %}
+        </fieldset>
+
+        <!-- 4. Game count -->
+        <fieldset class="option-group">
+          <legend>Cards per game</legend>
+          <input type="number" id="max_problems" name="max_problems" value="{{ options.max_problems }}" min="1">
+        </fieldset>
+
+        <!-- 5. Stats -->
+        <fieldset class="option-group">
+          <legend>Stats</legend>
+          <label class="stats-toggle">
+            <input type="checkbox" id="stats" name="stats" value="yes"
+                   {{ "checked" if options.stats else "" }}>
+            <span class="toggle-track" aria-hidden="true"></span>
+            Show stats
+          </label>
+        </fieldset>
+
+        <!-- 6. Cancel / Save -->
+        <div class="options-actions">
+          <button type="button"
+                  class="options-cancel-btn"
+                  hx-get="/partials/flashcards-content"
+                  hx-target="#flashcard-game"
+                  hx-swap="outerHTML">
+            Cancel
+          </button>
+          <button type="submit" class="options-save-btn">Save</button>
+        </div>
+
+      </form>
+    </div> <!-- options-column -->
+  </div> <!-- container -->
+</div> <!-- flashcard-game -->

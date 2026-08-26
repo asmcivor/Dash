@@ -1,0 +1,19 @@
+Use Case:Options System 
+* Actor: System
+* Goal: Options management flow
+* Preconditions: Flashcard screen is displayed
+* Trigger: User clicks the gear icon
+1. Save the game stat into the session cookie
+2. Retrieve the options data for the form. 
+    2.1 read the options cookie
+    2.2 pass the options and the partial for flashoptions back to the fronted.  The HTML will load the current options into the form as it is displayed
+3. User Clicks Save
+    3.1 read the form and update the options cookie as necessary.
+    3.2 Restore the game state from the session cookie.  Update any games values from the settings that impact the current game
+    3.3 Pass the game and the flashcard_content back to the front end.
+4. User Clicks Cancel (flashcard_content)
+    4.1 restore the game state from the session cookie 
+    4.2 pass the game and flashcard_content back to the front end.
+* Main flow: Numbered steps, actor action → system response, alternating
+* Postconditions: What's true when it's done successfully
+* Alternate/edge flows: What happens on wrong answers, invalid input, edge cases (division by zero, negative results, etc.)

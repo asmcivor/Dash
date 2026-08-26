@@ -5,7 +5,7 @@ from fastapi.responses import Response
 import pytest 
 import logging
 from unittest.mock import MagicMock
-from services.flashcard_service import Game, GameProcessor, Problem, Operand
+from services.flashcard_service import Game, GameProcessor, Options, Problem, Operand
 from constants import COOKIE_FLASHCARD_GAME_SESSION, COOKIE_FLASHCARD_OPTIONS
 from services.cookie_helper import *
 
@@ -129,7 +129,7 @@ class TestGameToDict:
         assert result["wrong_count"] == 0
         assert result["problem_count"] == 0
         assert result["current_problem_index"] == 0
-        assert result["problems"] == []
+        assert result["problem"] == None
 
     def test_to_dict_operand_is_serialized_as_value(self):
         """Operand enum should be stored as its raw value, not the enum itself."""
@@ -143,7 +143,7 @@ class TestGameToDict:
             "running", "name", "description", "user", "low_value", "high_value",
             "operand", "max_problems", "timer", "timerval", "stats",
             "correct_count", "wrong_count", "problem_count",
-            "current_problem_index", "problems",
+            "current_problem_index", "problem",
         }
         result = Game().to_dict()
         assert set(result.keys()) == expected_keys
@@ -158,7 +158,7 @@ class TestGameToDict:
         assert result["timer"] is True
         assert result["timerval"] == 30
 
-    def test_to_dict_with_problems(self):
+    def test_to_dict_with_problem(self):
         game = Game()
         gameproc = GameProcessor(game)
         problem = gameproc.get_problem_values(Operand.ADD)
@@ -169,37 +169,15 @@ class TestGameToDict:
         game.add_problem(problem)
         result = game.to_dict()
         assert result["problem_count"] == 1
-        assert result["problems"][0]["operand"] == Operand.ADD.value
-        assert result["problems"][0]["user_answer"] == 0
-        assert result["problems"] == [{"number1": num1, "number2": num2, "answer": answer, "correct_answer": correct_answer, "checked": False,"user_answer": 0, "operand": Operand.ADD.value}]
-        # add two more problems and verify  
-        problem2 = gameproc.get_problem_values(Operand.SUBTRACT)
-        num1_2 = problem2.number1
-        num2_2 = problem2.number2
-        answer2 = problem2.answer
-        correct_answer2 = problem2.correct_answer
-        game.add_problem(problem2)
-        problem3 = gameproc.get_problem_values(Operand.MULTIPLY)
-        num1_3 = problem3.number1
-        num2_3 = problem3.number2
-        answer3 = problem3.answer
-        correct_answer3 = problem3.correct_answer
-        game.add_problem(problem3)
-        result = game.to_dict()
-        assert result["problems"] == [
-            {"number1": num1, "number2": num2, "answer": answer, "correct_answer": correct_answer, "user_answer": 0, "checked": False, "operand": Operand.ADD.value},
-            {"number1": num1_2, "number2": num2_2, "answer": answer2, "correct_answer": correct_answer2, "user_answer": 0, "checked": False, "operand": Operand.SUBTRACT.value},
-            {"number1": num1_3, "number2": num2_3, "answer": answer3, "correct_answer": correct_answer3, "user_answer": 0, "checked": False, "operand": Operand.MULTIPLY.value},
-        ]
+        assert result["problem"]["operand"] == Operand.ADD.value
+        assert result["problem"]["user_answer"] == 0
+        assert result["problem"] == {"number1": num1, "number2": num2, "answer": answer, "correct_answer": correct_answer, "checked": False, "user_answer": 0, "operand": Operand.ADD.value}
+       
 
     def test_to_dict_with_no_problems(self):
-            game = Game()
-            gameproc = GameProcessor(game)
-            problem = gameproc.get_problem_values(Operand.ADD)
-            result = game.to_dict()
-            assert result["problems"] == []
-            # read back the result from game and ensure problems is None
-            assert game.problems == []
+        game = Game()
+        result = game.to_dict()
+        assert result["problem"] == None
             
            
 
@@ -232,7 +210,7 @@ class TestGameFromDict:
         assert result.low_value == 0
         assert result.high_value == 20
         assert result.correct_count == 0
-        assert result.problems == []
+        assert result.problem is None
 
     def test_from_dict_custom_values(self):
         data = self._default_dict()
@@ -292,36 +270,44 @@ class TestProblems:
         assert problem.answer == problem.number1 // problem.number2
         assert problem.operand == "/"
 
+    def test_operand_plusminus(self):
+        gameproc = GameProcessor(Game(low_value=0, high_value=20))
+        problem = gameproc.get_problem_values(operand=Operand.PLUSMINUS)
+        assert problem.number1 >= gameproc.game.low_value and problem.number1 <= gameproc.game.high_value
+        assert problem.number2 >= gameproc.game.low_value and problem.number2 <= gameproc.game.high_value
+        assert problem.answer == problem.number1 + problem.number2 or problem.answer == problem.number1 - problem.number2
+        assert problem.operand == "+" or problem.operand == "-"
+
+    def test_operand_multdiv(self):
+        gameproc = GameProcessor(Game(low_value=0, high_value=20))
+        problem = gameproc.get_problem_values(operand=Operand.MULTDIV)
+        assert problem.number1 >= gameproc.game.low_value and problem.number1 <= gameproc.game.high_value
+        assert problem.number2 >= gameproc.game.low_value and problem.number2 <= gameproc.game.high_value
+        assert problem.answer == problem.number1 * problem.number2 or problem.answer == problem.number1 // problem.number2
+        assert problem.operand == "*" or problem.operand == "/"
+    def test_operand_random(self):
+        gameproc = GameProcessor(Game(low_value=0, high_value=20))
+        problem = gameproc.get_problem_values(operand=Operand.RANDOM)
+        assert problem.number1 >= gameproc.game.low_value and problem.number1 <= gameproc.game.high_value
+        assert problem.number2 >= gameproc.game.low_value and problem.number2 <= gameproc.game.high_value
+        assert problem.answer == problem.number1 +problem.number2 or problem.answer == problem.number1 -problem.number2 or problem.answer == problem.number1 * problem.number2 or problem.answer == problem.number1 //problem.number2
+        assert problem.operand == "+" or problem.operand == "-" or problem.operand == "/" or problem.operand == "*"
+
     def test_add_problem_game(self):
         game = Game(low_value=0, high_value=20)
         gameproc = GameProcessor(game)
         problem = gameproc.get_problem_values(operand=Operand.ADD)
         game.add_problem(problem)
-        assert len(game.problems) == 1
-        assert gameproc.game.problems[0] == problem
-        assert game.problems[0].number1 >= game.low_value
-        assert game.problems[0].number2 >= game.low_value
-        assert game.problems[0].number1 <= game.high_value
-        assert game.problems[0].number2 <= game.high_value
-        assert game.problems[0].answer == game.problems[0].number1 + game.problems[0].number2
-        assert game.problems[0].operand == "+"  
+        assert game.problem is not None
+        assert gameproc.game.problem == problem
+        assert game.problem.number1 >= game.low_value
+        assert game.problem.number2 >= game.low_value
+        assert game.problem.number1 <= game.high_value
+        assert game.problem.number2 <= game.high_value
+        assert game.problem.answer == (game.problem.number1 +game.problem.number2)
+        assert game.problem.operand.value == Operand.ADD.value
 
  
-    def test_add_multiple_problems_game(self):
-        game = Game(low_value=0, high_value=20)
-        gameproc = GameProcessor(game)
-        problem = gameproc.get_problem_values(operand=Operand.ADD)
-        # save problem one low value and answer
-        problem1_low_value = problem.number1
-        problem1_answer = problem.answer
-        game.add_problem(problem)
-        problem2 = gameproc.get_problem_values(operand=Operand.ADD)
-        game.add_problem(problem2)
-        assert len(game.problems) == 2
-        assert game.problems[0].number1 == problem1_low_value
-        assert game.problems[0].answer == problem1_answer
-        assert game.problems[1] == problem2
-
     def test_check_problem_correct(self):
         game = Game(low_value=0, high_value=20)
         gameproc = GameProcessor(game)
@@ -397,3 +383,39 @@ class TestProblemFromDict:
         data["operand"] = "invalid"
         with pytest.raises(ValueError):
             Problem.from_dict(data)
+
+class TestOptionsFromDict:
+
+    def test_from_dict_returns_options_instance(self):
+        result = Options.from_dict(Options().to_dict())
+        assert isinstance(result, Options)
+
+    def test_from_dict_roundtrip(self):
+        options = Options(operand="+", low_value=0, high_value=20, max_problems=20, timer=False, timerval=20, stats=False)
+        assert Options.from_dict(options.to_dict()) == options
+
+    def test_from_dict_raises_on_missing_key(self):
+        data = Options().to_dict()
+        del data["operand"]
+        with pytest.raises(KeyError):
+            Options.from_dict(data)
+
+class TestOptionsToDict:
+
+    def test_to_dict_returns_dict(self):
+        assert isinstance(Options().to_dict(), dict)
+
+    def test_to_dict_contains_all_keys(self):
+        expected_keys = {"operand", "low_value", "high_value", "max_problems", "timer", "timerval", "stats"}
+        assert set(Options().to_dict().keys()) == expected_keys
+
+    def test_to_dict_custom_values(self):
+        options = Options(Operand.ADD, low_value=5, high_value=10, max_problems=10, timer=True, timerval=30, stats=True)
+        result = options.to_dict()
+        assert result["operand"] == Operand.ADD.value
+        assert result["low_value"] == 5
+        assert result["high_value"] == 10
+        assert result["max_problems"] == 10
+        assert result["timer"] == True
+        assert result["timerval"] == 30
+        assert result["stats"] == True
