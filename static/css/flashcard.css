@@ -330,8 +330,8 @@
 .operand-pill span:hover { transform: translateY(-1px); }
 
 .operand-pill input:checked + span {
-  background: var(--moss);
-  border-color: var(--moss-dk);
+  background: var(--paper);
+  border-color: var(--accent);
   color: var(--card);
 }
 
@@ -373,7 +373,7 @@
 .range-fields input[type="number"]:focus,
 .option-group > input[type="number"]:focus {
   outline: none;
-  border-color: var(--moss);
+  border-color: var(--ink);
 }
 
 /* 3. Timer toggle + value field */
