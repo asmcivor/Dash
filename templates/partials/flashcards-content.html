@@ -84,7 +84,7 @@
                 type="button"
                 class="go-next-btn"
                 {% if game.gameover %}disabled{% endif %}
-                {% if current is none or current.checked %}autofocus{% endif %}
+                {% if current is none or current.checked and not game.gameover %}autofocus{% endif %}
                 hx-post="/partials/flashcards-next"
                 hx-target="#flashcard-game"
                 hx-swap="innerHTML">{{ "Start" if not current else "Next" }}
@@ -94,6 +94,7 @@
         <div class="game-controls" id="endgame">
           <button type="button"
               class="new-game-btn"
+              {% if game.gameover %}autofocus{% endif %}
               hx-post="/partials/flashcards-newgame"
               hx-target="#flashcard-game"
               hx-swap="innerHTML">New Game

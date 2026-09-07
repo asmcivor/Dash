@@ -140,8 +140,8 @@
 
 .end-image {
   display: block;
-  width: 300px;
-  height: auto;
+  width: 200px;
+  height: 200px;
   object-fit: contain;
 }
 .operand {
