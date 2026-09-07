@@ -545,3 +545,45 @@
 
 .options-cancel-btn:active,
 .options-save-btn:active { transform: scale(0.97); }
+
+/* ---- Mobile: larger tap targets ---- */
+@media (max-width: 600px) {
+
+  .op-btn,
+  .answer-submit-btn,
+  .go-next-btn,
+  .new-game-btn,
+  .end-game-btn,
+  .options-btn,
+  .pause-timer-btn,
+  .options-cancel-btn,
+  .options-save-btn,
+  .operand-pill span {
+    min-height: 44px;
+    min-width: 44px;
+    font-size: 1.1rem;
+    padding: 0.75rem 1.1rem;
+  }
+
+  .answer-input,
+  .answer-input-correct,
+  .answer-input-wrong {
+    width: 100%;
+    max-width: 140px;
+    font-size: 2rem;
+  }
+
+  .game-controls {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .options-actions {
+    flex-direction: column-reverse;
+  }
+
+  .options-actions .options-cancel-btn,
+  .options-actions .options-save-btn {
+    width: 100%;
+  }
+}
