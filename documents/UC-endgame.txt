@@ -1,0 +1,16 @@
+Use Case: End Game
+* Actor: Player
+* Goal: Display the information to the user when the game is over
+* Preconditions: Game has been started
+* Trigger: The max number of problems has been reached or the user press the end game button
+* Main flow:
+    1. The max number of problems have been reached and the backend passes in a gameover value of 1.
+    2. The answer section is updated with the last result
+        2.1 if stats are not displayed then show the final stats.
+        2.2 display in the stats section a game end gif.  100% is celebration gif, >=80 and < 100 is a good job gif. >=50 and < 80 is a work harder gif and < 50 a more practice gif
+        2.3 disable the next button
+    3. User clicks the new game button to start the next game.
+* Postconditions: Stats and reward GIF are displayed.
+* Alternate/edge flows: End Game Button is pressed
+    1. Game play area shows the number of correct, wrong, total played.  There isn't a success rate GIF.
+    1.1 User clicks the OK button control returns to the main screen with a new game.

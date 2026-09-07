@@ -103,8 +103,25 @@ class TestGameplay:
         retrieved_game = get_json_cookie(request=reqeustsession2, key=COOKIE_FLASHCARD_GAME_SESSION, default=DEFAULT_FLASHCARD_GAME_SESSION)
         assert retrieved_game["current_problem_index"] == 5
         assert retrieved_game["running"] is True
-
-        
+    def test_gameover_start(self):
+        response = MagicMock()
+        requestsession = MagicMock(cookies={COOKIE_FLASHCARD_GAME_SESSION: urllib.parse.quote(json.dumps(DEFAULT_FLASHCARD_GAME_SESSION))})
+        requestoptions = MagicMock(cookies={COOKIE_FLASHCARD_OPTIONS: urllib.parse.quote(json.dumps(DEFAULT_FLASHCARD_OPTIONS))})  
+        gamesession = get_json_cookie(request=requestsession, key=COOKIE_FLASHCARD_GAME_SESSION, default=DEFAULT_FLASHCARD_GAME_SESSION)
+                # Pretend the game is running and save the session to the response cookie
+        assert gamesession["running"] is False
+                # get the options and then create a game
+        options = get_json_cookie(request=requestoptions,key=COOKIE_FLASHCARD_OPTIONS, default=DEFAULT_FLASHCARD_OPTIONS)
+        game = Game(
+                   operand=Operand(options["operand"]),
+                   low_value=options["low_value"],
+                   high_value=options["high_value"],
+                   max_problems=options["max_problems"],
+                   timer=options["timer"],
+                   timerval=options["timerval"],
+                   stats=options["stats"]
+                )
+        assert game.gameover is False
 
 
 class TestGameToDict:
@@ -129,6 +146,7 @@ class TestGameToDict:
         assert result["wrong_count"] == 0
         assert result["problem_count"] == 0
         assert result["current_problem_index"] == 0
+        assert result["gameover"] is False
         assert result["problem"] == None
 
     def test_to_dict_operand_is_serialized_as_value(self):
@@ -143,7 +161,7 @@ class TestGameToDict:
             "running", "name", "description", "user", "low_value", "high_value",
             "operand", "max_problems", "timer", "timerval", "stats",
             "correct_count", "wrong_count", "problem_count",
-            "current_problem_index", "problem",
+            "current_problem_index","gameover", "problem",
         }
         result = Game().to_dict()
         assert set(result.keys()) == expected_keys

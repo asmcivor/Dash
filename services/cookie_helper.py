@@ -30,6 +30,7 @@ DEFAULT_FLASHCARD_GAME_SESSION = {
     "wrong_count": 0,
     "problem_count": 0,
     "current_problem_index": 0,
+    "gameover": False,
     "problems": []
 }
 

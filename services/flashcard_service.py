@@ -120,6 +120,7 @@ class Game:
     problem_count: int = 0
     running: bool = False
     current_problem_index: int = 0
+    gameover: bool = False
     problem: Problem = field(default=None)
     
     @classmethod
@@ -140,6 +141,7 @@ class Game:
             wrong_count=data["wrong_count"],
             problem_count=data["problem_count"],
             current_problem_index=data["current_problem_index"],
+            gameover=data["gameover"],
             problem=Problem.from_dict(data["problem"] if data["problem"] else None),
         )
         return game
@@ -161,6 +163,7 @@ class Game:
             "wrong_count": self.wrong_count,
             "problem_count": self.problem_count,
             "current_problem_index": self.current_problem_index,
+            "gameover": self.gameover,
             "problem": self.problem.to_dict() if self.problem else None,
         }
     
@@ -281,6 +284,7 @@ class GameProcessor:
                 return Problem(number1=number1, number2=number2, answer=number1 * number2, operand=Operand.MULTIPLY)
             else:
                 number2 = random.randint(self.game.low_value, self.game.high_value)
+                number2 = number2 if number2 != 0 else 1
                 number1 = self._get_valid_number(number2, Operand.DIVIDE)
                 return Problem(number1=number1, number2=number2, answer=number1 // number2, operand=Operand.DIVIDE)
         else:  # Random case

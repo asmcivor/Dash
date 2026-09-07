@@ -145,6 +145,8 @@ async def flashcards_answer(
     logger.debug(f"Current problem before answer: {game.problem}")
     if current_problem:
         correct = game.check_problem(answer, current_problem)
+        if game.problem_count >= game.max_problems:
+            game.gameover = True
         logger.debug(f"In Answer: problem_count={game.problem_count} current_problem_index={game.current_problem_index} correct={correct}")
     else:
         correct = None
@@ -152,7 +154,10 @@ async def flashcards_answer(
 
     response = templates.TemplateResponse("partials/flashcards-content.html", {"request": request, "game": game})
     gamesession = game.to_dict()
-    gamesession["running"] = True
+    if game.gameover:
+        gamesession["running"] = False
+    else:
+        gamesession["running"] = True
     set_json_cookie(response, COOKIE_FLASHCARD_GAME_SESSION, gamesession)
     return response 
 

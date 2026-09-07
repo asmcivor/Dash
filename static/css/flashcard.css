@@ -138,6 +138,12 @@
   border-width: 3px;
 }
 
+.end-image {
+  display: block;
+  width: 300px;
+  height: auto;
+  object-fit: contain;
+}
 .operand {
   font-size: 2.6rem;
   font-weight: 600;
@@ -381,6 +387,8 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  border: 1px solid var(--ink);
+  margin: 1px; 
   gap: 1rem;
 }
 
@@ -401,6 +409,12 @@
   opacity: 0;
   width: 1px;
   height: 1px;
+}
+
+.stats-label {
+ text-align: center;
+  color: var(--ink);
+  font-weight: 750;
 }
 
 .toggle-track {
