@@ -103,6 +103,9 @@ class OptionError:
     timer_warning: str = ""  # Warning message for timer value
     timer_error: str = ""  # Error message for timer value
 
+class NumberError:
+    number_error: str = ""
+
 @dataclass
 class Game:
     name: str = "Flashcard Game"

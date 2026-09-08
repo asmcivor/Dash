@@ -1,6 +1,7 @@
 from datetime import datetime
 import logging
 import json
+from numbers import Number
 import urllib.parse
 from typing import Optional
 from fastapi import APIRouter, Form, Request, Depends, Query, logger
@@ -9,7 +10,7 @@ from fastapi.responses import HTMLResponse, Response
 
 from dependencies import get_templates
 
-from services.flashcard_service import Game, GameProcessor, Operand, Options, OptionError
+from services.flashcard_service import Game, GameProcessor, NumberError, Operand, Options, OptionError
 from constants import COOKIE_RECENT_SEARCHES, MAX_RECENT_SEARCHES, COOKIE_FLASHCARD_GAME_SESSION, COOKIE_FLASHCARD_OPTIONS
 from services.cookie_helper import *
 
@@ -137,7 +138,14 @@ async def flashcards_answer(
     # This route handles the "Answer" action for the flashcard game, returning the updated flashcard content.
     game = build_game_from_cookies(request)
     form = await request.form()
-    answer = int(form.get("answer", 0))
+    error = NumberError()
+    try:
+        answer = int(form.get("answer", 0))
+    except (ValueError):
+        answer = 0
+        error.number_error = f"Invalid answer format. Not a number"
+        response = templates.TemplateResponse("partials/flashcards-content.html", {"request": request, "game": game, "error": error})   
+        
     logger.debug(f"Form data received: {form}")
     logger.debug(f"game info: {game}")
     
@@ -152,7 +160,7 @@ async def flashcards_answer(
         correct = None
     
 
-    response = templates.TemplateResponse("partials/flashcards-content.html", {"request": request, "game": game})
+    response = templates.TemplateResponse("partials/flashcards-content.html", {"request": request, "game": game, "error": error})
     gamesession = game.to_dict()
     if game.gameover:
         gamesession["running"] = False

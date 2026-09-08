@@ -211,9 +211,9 @@
 }
 */
 .answer-input:focus-visible {
-  outline: 2px solid var(--debug);
-  outline-offset: 3px;
-  border-radius: 3px;
+  outline: 2px solid var(--secondary);
+  /*outline-offset: 3px;
+  border-radius: 3px;*/
 }
 
 /* remove number input spinners for a cleaner worksheet look */

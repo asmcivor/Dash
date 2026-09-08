@@ -61,8 +61,9 @@
             <input id="answer"
                    name="answer"
                    class="answer-input{%- if current is none or not current.checked -%} {%- elif current.checked and current.correct_answer -%} -correct {%- elif current.checked and not current.correct_answer -%} -wrong {%- endif -%}"
-                   type="number"
+                   type="text"
                    inputmode="numeric"
+                   pattern="[0-9]*"
                    value="{{ current.user_answer if current and current.checked else '' }}"
                    placeholder="?"
                    {% if current and not current.checked and not game.gameover %}data-autofocus{% endif %}
