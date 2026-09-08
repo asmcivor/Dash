@@ -211,7 +211,7 @@
 }
 */
 .answer-input:focus-visible {
-  outline: 2px solid var(--ink);
+  outline: 2px solid var(--debug);
   outline-offset: 3px;
   border-radius: 3px;
 }
