@@ -86,6 +86,15 @@
   {% block content %}{% endblock %}
 </main>
 <script>
+  <!-- fix focus for Safari -->
+  document.body.addEventListener('htmx:afterSwap', (e) => {
+  const target = e.detail.target.matches('[data-autofocus]')
+    ? e.detail.target
+    : e.detail.target.querySelector('[data-autofocus]');
+  if (target) {
+    target.focus();
+  }
+});
   document.getElementById("timezone").value = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const toggle = document.getElementById('nav-toggle');
   const drawer = document.getElementById('nav-drawer');

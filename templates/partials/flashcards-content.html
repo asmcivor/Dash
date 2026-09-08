@@ -65,7 +65,7 @@
                    inputmode="numeric"
                    value="{{ current.user_answer if current and current.checked else '' }}"
                    placeholder="?"
-                   {% if current and not current.checked %}autofocus{% endif %}
+                   {% if current and not current.checked and not game.gameover %}data-autofocus{% endif %}
                    aria-label="Submit answer"
                    autocomplete="off">
           </div> 
@@ -84,7 +84,7 @@
                 type="button"
                 class="go-next-btn"
                 {% if game.gameover %}disabled{% endif %}
-                {% if current is none or current.checked and not game.gameover %}autofocus{% endif %}
+                {% if (current is none or current.checked) and not game.gameover %}data-autofocus{% endif %}
                 hx-post="/partials/flashcards-next"
                 hx-target="#flashcard-game"
                 hx-swap="innerHTML">{{ "Start" if not current else "Next" }}
@@ -94,7 +94,7 @@
         <div class="game-controls" id="endgame">
           <button type="button"
               class="new-game-btn"
-              {% if game.gameover %}autofocus{% endif %}
+              {% if game.gameover %}data-autofocus{% endif %}
               hx-post="/partials/flashcards-newgame"
               hx-target="#flashcard-game"
               hx-swap="innerHTML">New Game
