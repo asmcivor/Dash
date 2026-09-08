@@ -7,8 +7,8 @@ from fastapi.responses import Response
 DEFAULT_FLASHCARD_OPTIONS = {
     "operand": "+",
     "low_value": 0,
-    "high_value": 20,
-    "max_problems": 20,
+    "high_value": 10,
+    "max_problems": 10,
     "timer": False,
     "timerval": 20,
     "stats": True
@@ -21,8 +21,8 @@ DEFAULT_FLASHCARD_GAME_SESSION = {
     "user": "Player",
     "operand": "+",
     "low_value": 0,
-    "high_value": 20,
-    "max_problems": 20,
+    "high_value": 10,
+    "max_problems": 10,
     "timer": False,
     "timerval": 20,
     "stats": False,
