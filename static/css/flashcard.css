@@ -204,14 +204,14 @@
   color: var(--ink-soft);
   opacity: 0.6;
 }
-
+/*
 .answer-input:focus {
   outline: none;
   border-bottom-color: var(--moss);
 }
-
+*/
 .answer-input:focus-visible {
-  outline: 2px solid var(--focus);
+  outline: 2px solid var(--ink);
   outline-offset: 3px;
   border-radius: 3px;
 }
