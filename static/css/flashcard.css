@@ -83,7 +83,18 @@
   border-color: var(--moss-dk);
   color: var(--card);
 }
-
+/* --- Counter --- */
+.counter {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  background: var(--paper);
+  padding: 0.25rem 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
 /* ---- Flashcard ---- */
 
 .flashcard {
